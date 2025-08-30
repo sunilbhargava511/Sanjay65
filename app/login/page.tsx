@@ -70,48 +70,50 @@ export default function LoginPage() {
   // User is authenticated - show dashboard
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
+      {/* Header - Mobile Optimized */}
       <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-semibold">ZeroFinanx Dashboard</h1>
-            <p className="text-sm text-gray-600">Welcome back, {storedEmail}</p>
-          </div>
-          <div className="flex gap-3">
-            <a
-              href="/"
-              className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-            >
-              Home
-            </a>
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-            >
-              Sign Out
-            </button>
+        <div className="mx-auto max-w-6xl px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between mb-2 sm:mb-0">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-base sm:text-lg font-semibold truncate">ZeroFinanx Dashboard</h1>
+              <p className="text-xs sm:text-sm text-gray-600 truncate">Welcome, {storedEmail}</p>
+            </div>
+            <div className="flex gap-2 sm:gap-3 ml-4">
+              <a
+                href="/"
+                className="inline-flex items-center rounded-lg border border-gray-300 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-900 hover:bg-gray-50"
+              >
+                Home
+              </a>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center rounded-lg border border-gray-300 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-900 hover:bg-gray-50"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* Main Content - Mobile Optimized */}
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
           
           {/* Welcome Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Welcome to ZeroFinanx</h2>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Welcome to ZeroFinanx</h2>
             <p className="text-gray-600 text-sm mb-4">
               Your financial education journey starts here. Access your courses, calculators, and progress.
             </p>
-            <button className="bg-gray-900 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:opacity-90 transition">
+            <button className="w-full sm:w-auto bg-gray-900 text-white rounded-lg px-4 py-2.5 sm:py-2 text-sm font-semibold hover:opacity-90 transition">
               Start Learning
             </button>
           </div>
 
           {/* Progress Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Your Progress</h2>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Your Progress</h2>
             <p className="text-gray-600 text-sm mb-4">
               Track your financial education journey and see how far you&apos;ve come.
             </p>
@@ -122,8 +124,8 @@ export default function LoginPage() {
           </div>
 
           {/* Calculators Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Calculators</h2>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Calculators</h2>
             <p className="text-gray-600 text-sm mb-4">
               Access powerful financial calculators to help you make informed decisions.
             </p>
@@ -138,8 +140,8 @@ export default function LoginPage() {
           </div>
 
           {/* Lessons Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Lessons</h2>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Lessons</h2>
             <p className="text-gray-600 text-sm mb-4">
               Learn with educational videos organized by life stage and financial goals.
             </p>
@@ -154,9 +156,9 @@ export default function LoginPage() {
           </div>
 
           {/* Account Info */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm md:col-span-2 lg:col-span-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h2>
-            <div className="grid gap-4 md:grid-cols-2">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm sm:col-span-2 lg:col-span-4">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Account Information</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <p className="text-sm text-gray-900">{storedEmail}</p>
@@ -178,22 +180,22 @@ export default function LoginPage() {
         </div>
       </main>
 
-      {/* Lessons Modal */}
+      {/* Lessons Modal - Mobile Optimized */}
       {showLessons && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden mx-2">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Financial Lessons</h2>
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Financial Lessons</h2>
                 <button
                   onClick={() => setShowLessons(false)}
-                  className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                  className="text-gray-500 hover:text-gray-700 text-xl sm:text-2xl font-bold p-1"
                 >
                   ×
                 </button>
               </div>
             </div>
-            <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
+            <div className="overflow-y-auto max-h-[calc(95vh-80px)] sm:max-h-[calc(90vh-100px)]">
               <LessonCategoryView 
                 className="border-0 shadow-none rounded-none"
               />
@@ -202,22 +204,22 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Calculators Modal */}
+      {/* Calculators Modal - Mobile Optimized */}
       {showCalculators && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden mx-2">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Financial Calculators</h2>
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Financial Calculators</h2>
                 <button
                   onClick={() => setShowCalculators(false)}
-                  className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                  className="text-gray-500 hover:text-gray-700 text-xl sm:text-2xl font-bold p-1"
                 >
                   ×
                 </button>
               </div>
             </div>
-            <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
+            <div className="overflow-y-auto max-h-[calc(95vh-80px)] sm:max-h-[calc(90vh-100px)]">
               <CalculatorsList 
                 showHeader={false}
                 className="border-0 shadow-none rounded-none"

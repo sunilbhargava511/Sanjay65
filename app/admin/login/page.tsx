@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import LessonManager from '@/components/LessonManager';
+import StripeManager from '@/components/StripeManager';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [accessCode, setAccessCode] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'lessons' | 'calculators'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'lessons' | 'calculators' | 'stripe'>('dashboard');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,37 +26,39 @@ export default function AdminLoginPage() {
   if (isAuthorized) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        {/* Admin Header */}
+        {/* Admin Header - Mobile Optimized */}
         <header className="border-b border-red-200 bg-red-50">
-          <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-semibold text-red-900">ZeroFinanx Admin</h1>
-              <p className="text-sm text-red-700">Administrative Dashboard</p>
-            </div>
-            <div className="flex gap-3">
-              <a
-                href="/"
-                className="inline-flex items-center rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-900 hover:bg-red-100"
-              >
-                Home
-              </a>
-              <button
-                onClick={() => setIsAuthorized(false)}
-                className="inline-flex items-center rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-900 hover:bg-red-100"
-              >
-                Sign Out
-              </button>
+          <div className="mx-auto max-w-6xl px-4 py-3 sm:py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-base sm:text-lg font-semibold text-red-900 truncate">ZeroFinanx Admin</h1>
+                <p className="text-xs sm:text-sm text-red-700 truncate">Administrative Dashboard</p>
+              </div>
+              <div className="flex gap-2 sm:gap-3 ml-4">
+                <a
+                  href="/"
+                  className="inline-flex items-center rounded-lg border border-red-300 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-red-900 hover:bg-red-100"
+                >
+                  Home
+                </a>
+                <button
+                  onClick={() => setIsAuthorized(false)}
+                  className="inline-flex items-center rounded-lg border border-red-300 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-red-900 hover:bg-red-100"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Navigation */}
-        <nav className="border-b border-gray-200 bg-white">
+        {/* Navigation - Mobile Optimized */}
+        <nav className="border-b border-gray-200 bg-white overflow-x-auto">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="flex gap-6">
+            <div className="flex gap-4 sm:gap-6 min-w-max">
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`px-3 py-2 text-sm font-medium border-b-2 transition ${
+                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium border-b-2 transition whitespace-nowrap ${
                   activeTab === 'dashboard'
                     ? 'border-red-600 text-red-600'
                     : 'border-transparent text-gray-600 hover:text-gray-900'
@@ -65,7 +68,7 @@ export default function AdminLoginPage() {
               </button>
               <button
                 onClick={() => setActiveTab('lessons')}
-                className={`px-3 py-2 text-sm font-medium border-b-2 transition ${
+                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium border-b-2 transition whitespace-nowrap ${
                   activeTab === 'lessons'
                     ? 'border-red-600 text-red-600'
                     : 'border-transparent text-gray-600 hover:text-gray-900'
@@ -75,7 +78,7 @@ export default function AdminLoginPage() {
               </button>
               <button
                 onClick={() => setActiveTab('calculators')}
-                className={`px-3 py-2 text-sm font-medium border-b-2 transition ${
+                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium border-b-2 transition whitespace-nowrap ${
                   activeTab === 'calculators'
                     ? 'border-red-600 text-red-600'
                     : 'border-transparent text-gray-600 hover:text-gray-900'
@@ -83,18 +86,28 @@ export default function AdminLoginPage() {
               >
                 Calculators
               </button>
+              <button
+                onClick={() => setActiveTab('stripe')}
+                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium border-b-2 transition whitespace-nowrap ${
+                  activeTab === 'stripe'
+                    ? 'border-red-600 text-red-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Stripe
+              </button>
             </div>
           </div>
         </nav>
 
-        {/* Admin Content */}
-        <main className="mx-auto max-w-6xl px-4 py-8">
+        {/* Admin Content - Mobile Optimized */}
+        <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
           {activeTab === 'dashboard' && (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
             
             {/* System Status */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">System Status</h2>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">System Status</h2>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">API Status</span>
@@ -112,8 +125,8 @@ export default function AdminLoginPage() {
             </div>
 
             {/* User Analytics */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">User Analytics</h2>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">User Analytics</h2>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Total Users</span>
@@ -131,8 +144,8 @@ export default function AdminLoginPage() {
             </div>
 
             {/* Content Management */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Content</h2>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Content</h2>
               <div className="space-y-2">
                 <button 
                   onClick={() => setActiveTab('lessons')}
@@ -153,20 +166,20 @@ export default function AdminLoginPage() {
             </div>
 
             {/* Customer Management */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm md:col-span-2 lg:col-span-3">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Customer Management</h2>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm sm:col-span-2 lg:col-span-3">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Customer Management</h2>
               <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-gray-600 mb-4">
                   Passwordless authentication is active. Customers are identified by email only.
                 </p>
-                <div className="flex gap-3">
-                  <button className="bg-red-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-red-700 transition">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button className="bg-red-600 text-white rounded-lg px-4 py-2.5 sm:py-2 text-sm font-semibold hover:bg-red-700 transition">
                     Export Customer Data
                   </button>
-                  <button className="border border-gray-300 text-gray-900 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition">
+                  <button className="border border-gray-300 text-gray-900 rounded-lg px-4 py-2.5 sm:py-2 text-sm font-semibold hover:bg-gray-50 transition">
                     View Customer List
                   </button>
-                  <button className="border border-gray-300 text-gray-900 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition">
+                  <button className="border border-gray-300 text-gray-900 rounded-lg px-4 py-2.5 sm:py-2 text-sm font-semibold hover:bg-gray-50 transition">
                     Cookie Analytics
                   </button>
                 </div>
@@ -180,13 +193,17 @@ export default function AdminLoginPage() {
           )}
 
           {activeTab === 'calculators' && (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8">
               <div className="text-center">
-                <div className="text-gray-400 mb-2">📊</div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Calculator Management</h2>
+                <div className="text-gray-400 mb-2 text-2xl sm:text-3xl">📊</div>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Calculator Management</h2>
                 <p className="text-gray-600">Coming soon - manage financial calculators</p>
               </div>
             </div>
+          )}
+
+          {activeTab === 'stripe' && (
+            <StripeManager />
           )}
         </main>
       </div>
