@@ -1,267 +1,479 @@
-# ZeroFinanx User Guide
+# 📚 ZeroFinanx User Guide
 
-## Table of Contents
-1. [Welcome to ZeroFinanx](#welcome-to-zerofinanx)
-2. [Getting Started](#getting-started)
-3. [Account Setup](#account-setup)
-4. [Beta Program](#beta-program)
-5. [Educational Content](#educational-content)
-6. [Calculators & Tools](#calculators--tools)
-7. [Your Learning Journey](#your-learning-journey)
-8. [Account Management](#account-management)
-9. [Payment & Billing](#payment--billing)
-10. [Troubleshooting](#troubleshooting)
-11. [Frequently Asked Questions](#frequently-asked-questions)
+> **Zero Financial Anxiety - Your Complete Guide to Financial Education**
 
-## Welcome to ZeroFinanx
+---
+
+## 📖 Table of Contents
+
+### 🚀 Quick Start
+- [🎯 Welcome to ZeroFinanx](#welcome-to-zerofinanx)
+- [⚡ Getting Started](#getting-started)
+- [👤 Account Setup](#account-setup)
+
+### 📋 Core Features
+- [🧪 Beta Program](#beta-program)
+- [📚 Educational Content](#educational-content)
+- [🧮 Calculators & Tools](#calculators--tools)
+- [🎯 Your Learning Journey](#your-learning-journey)
+
+### ⚙️ Account & Support
+- [👤 Account Management](#account-management)
+- [💳 Payment & Billing](#payment--billing)
+- [🔧 Troubleshooting](#troubleshooting)
+- [❓ Frequently Asked Questions](#frequently-asked-questions)
+
+---
+
+## 🎯 Welcome to ZeroFinanx
 
 **Zero Financial Anxiety - Educational guidance for U.S. money choices**
 
 ZeroFinanx is designed to empower you with the knowledge and tools to make confident financial decisions. Our philosophy is simple: we aim to get "fired" as your financial educator by teaching you to be your own.
 
-### What ZeroFinanx Is
-- **Educational platform** focused on U.S. financial decisions
-- **Bite-sized lessons** and interactive tools
-- **No sales calls** or high-pressure tactics
-- **Evidence-based guidance** from experienced professionals
+### ✅ What ZeroFinanx **IS**
 
-### What ZeroFinanx Is NOT
-- **Not financial advice** - We provide education, you make decisions
-- **Not investment recommendations** - We teach concepts, not specific investments
-- **Not a replacement** for qualified financial advisors when you need personalized advice
+| Feature | Description |
+|---------|-------------|
+| 📚 **Educational Platform** | Focused exclusively on U.S. financial decisions |
+| ⚡ **Bite-sized Lessons** | Interactive tools and digestible content |
+| 🚫 **No Sales Calls** | Zero high-pressure tactics or pushy sales |
+| 🧠 **Evidence-based** | Guidance from experienced financial professionals |
 
-### Our Philosophy: "Fire Us"
-We're built to transfer skills, not create dependence. Our goal is to teach you a simple, U.S.-focused playbook so you can make confident decisions yourself. When you're ready, fire us!
+### ❌ What ZeroFinanx is **NOT**
 
-## Getting Started
+> ⚠️ **Important Disclaimers**
+> 
+> - **Not financial advice** - We provide education, you make decisions
+> - **Not investment recommendations** - We teach concepts, not specific investments  
+> - **Not a replacement** for qualified financial advisors when you need personalized advice
 
-### System Requirements
-- **Web browser** (Chrome, Firefox, Safari, Edge)
-- **Email address** for account creation
-- **Internet connection** for accessing content
+### 🎯 Our Philosophy: "Fire Us"
 
-### Supported Sign-In Methods
-- **Google Account** - Quick sign-in with your Google account
-- **Apple ID** - Sign in with Apple (iOS/Mac users)
-- **Email** - Traditional email and password login
+> 💡 **Our Mission**: Transfer skills, not create dependence
+>
+> We teach you a simple, U.S.-focused playbook so you can make confident decisions yourself. When you're ready, fire us!
 
-### First Visit
-1. Visit [ZeroFinanx.com](https://zerofinanx.com)
-2. Click **"Login"** in the top-right corner
-3. Choose your preferred sign-in method
-4. Complete account setup
+---
 
-## Account Setup
+### 🚀 Quick Navigation
+- **New User?** → [Getting Started Guide](#getting-started)
+- **Ready to Join?** → [Beta Program Details](#beta-program)
+- **Need Help?** → [Troubleshooting](#troubleshooting)
+- **Have Questions?** → [FAQ Section](#frequently-asked-questions)
 
-### Creating Your Account
+## ⚡ Getting Started
 
-#### Option 1: Sign In with Google
-1. Click **"Login"** on homepage
-2. Select **"Continue with Google"**
-3. Choose your Google account
-4. Grant necessary permissions
-5. Complete profile setup
+### 💻 System Requirements
 
-#### Option 2: Sign In with Apple
-1. Click **"Login"** on homepage
-2. Select **"Continue with Apple"**
-3. Authenticate with Face ID, Touch ID, or password
-4. Choose email sharing preference
-5. Complete profile setup
+| Requirement | Details |
+|-------------|----------|
+| 🌐 **Web Browser** | Chrome, Firefox, Safari, Edge (latest versions) |
+| 📧 **Email Address** | For account creation and communications |
+| 🌍 **Internet Connection** | Required for accessing all content |
 
-#### Option 3: Email Sign-Up
-1. Click **"Login"** on homepage
-2. Select **"Sign up with Email"**
-3. Enter your email address
-4. Check email for magic link
-5. Click link to complete setup
+### 🔐 Supported Sign-In Methods
 
-### Profile Information
+#### 🟦 Google Account
+- ✅ Quick one-click sign-in
+- ✅ Secure OAuth authentication
+- ✅ No password management needed
+
+#### 🟫 Apple ID  
+- ✅ Sign in with Apple (iOS/Mac users)
+- ✅ Privacy-focused authentication
+- ✅ Face ID / Touch ID support
+
+#### 📧 Email Login
+- ✅ Traditional email and password
+- ✅ Magic link authentication
+- ✅ Works on any device
+
+### 🎯 Your First Visit - Step by Step
+
+**Getting started is easy:**
+
+1. 🌐 Visit ZeroFinanx.com
+2. 🔐 Click "Login" (top-right corner)
+3. 🎯 Choose your preferred sign-in method
+4. ✅ Complete account setup
+5. 🚀 Start your 30-day free trial!
+
+## 👤 Account Setup
+
+### 🚀 Creating Your Account
+
+<details>
+<summary><strong>🟦 Option 1: Sign In with Google</strong></summary>
+
+1. 🏠 Click **"Login"** on homepage
+2. 🟦 Select **"Continue with Google"**  
+3. 👤 Choose your Google account
+4. ✅ Grant necessary permissions
+5. 📝 Complete profile setup
+
+> 💡 **Tip**: Google sign-in is the fastest option!
+
+</details>
+
+<details>
+<summary><strong>🍎 Option 2: Sign In with Apple</strong></summary>
+
+1. 🏠 Click **"Login"** on homepage
+2. 🍎 Select **"Continue with Apple"**
+3. 🔐 Authenticate with Face ID, Touch ID, or password
+4. 📧 Choose email sharing preference
+5. 📝 Complete profile setup
+
+> 🔒 **Privacy**: Apple sign-in offers enhanced privacy controls
+
+</details>
+
+<details>
+<summary><strong>📧 Option 3: Email Sign-Up</strong></summary>
+
+1. 🏠 Click **"Login"** on homepage
+2. 📧 Select **"Sign up with Email"**
+3. ✍️ Enter your email address
+4. 📬 Check email for magic link
+5. 🔗 Click link to complete setup
+
+> ⚠️ **Note**: Check your spam folder if you don't see the magic link!
+
+</details>
+
+### 📋 Profile Information
+
 After signing in, you'll be asked to provide:
-- **Name** (for personalization)
-- **Financial goals** (to customize content)
-- **Experience level** (beginner, intermediate, advanced)
-- **Areas of interest** (saving, investing, taxes, etc.)
 
-## Beta Program
+| Field | Purpose | Examples |
+|-------|---------|----------|
+| 👤 **Name** | Personalization | "John Smith" |
+| 🎯 **Financial Goals** | Content customization | Emergency fund, retirement, debt payoff |
+| 📊 **Experience Level** | Difficulty matching | Beginner, Intermediate, Advanced |
+| 🎯 **Areas of Interest** | Content prioritization | Saving, investing, taxes, real estate |
 
-### What is the Beta Program?
-ZeroFinanx is currently in **Limited Beta** with only **100 spots** available. Beta users get special benefits and help shape the platform.
+> 🔄 **Good News**: You can update these anytime in your profile settings!
 
-### Beta Benefits
-- **30-day free trial** - Full access with no charges
-- **$100 one-time payment** after trial (instead of monthly subscription)
-- **$200 cash bonus** if ZeroFinanx exits beta with $100k+ revenue
-- **Direct influence** on feature development
-- **Priority support** from our team
+## 🧪 Beta Program
 
-### Beta Terms
-- **Free trial period**: 30 days from signup
-- **No charges** during trial period
-- **Cancel anytime** in first 30 days for $0
-- **After trial**: One-time $100 payment for continued access
-- **No refunds** after trial period ends (except as required by law)
-- **Beta bonus**: $200 cash if we reach revenue milestone
+> 🚨 **Limited Time**: Only **100 spots** available!
 
-### How to Join
-1. Visit ZeroFinanx homepage
-2. Click **"Start Free Trial"** on Education (Beta) card
-3. Complete account setup
-4. Begin your 30-day free trial immediately
+### 🤔 What is the Beta Program?
 
-## Educational Content
+ZeroFinanx is currently in **Limited Beta** - an exclusive early access program where beta users get special benefits and help shape the platform's future.
 
-### Content Structure
-Our educational content is organized around core financial concepts:
+### 🎁 Beta Benefits
 
-#### 1. Foundation Concepts
-- **Save Number** - How much you need to save
-- **Spend Number** - How much you can safely spend
-- **Next Two Actions** - Immediate steps to take
-- **Emergency fund basics**
-- **Debt management principles**
+| Benefit | Details | Value |
+|---------|---------|-------|
+| 🆓 **Free Trial** | 30 days full access | $0 during trial |
+| 💰 **Special Pricing** | One-time $100 payment | vs. future monthly subscriptions |
+| 🎉 **Cash Bonus** | $200 if we hit $100k revenue | Potential bonus for early supporters |
+| 🛠️ **Feature Influence** | Direct input on development | Your feedback shapes the product |
+| 🥇 **Priority Support** | Faster response times | VIP treatment |
 
-#### 2. U.S.-Specific Guidance
-- **401(k) and retirement accounts**
-- **Tax-advantaged savings (IRA, HSA)**
-- **Social Security planning**
-- **Healthcare costs and insurance**
-- **Tax planning strategies**
+### 📜 Beta Terms - The Fine Print
 
-#### 3. Advanced Topics
-- **Investment fundamentals**
-- **Real estate considerations**
-- **Estate planning basics**
-- **Small business finances**
-- **Tax optimization**
+```
+✅ FREE TRIAL PERIOD: 30 days from signup
+✅ NO CHARGES: $0 during trial period  
+✅ CANCEL ANYTIME: First 30 days = $0 cost
+💳 AFTER TRIAL: One-time $100 payment for continued access
+🚫 NO REFUNDS: After trial period ends (except as required by law)
+💵 BETA BONUS: $200 cash if we reach revenue milestone
+```
 
-### Learning Format
-- **Bite-sized lessons** (5-10 minutes each)
-- **Interactive exercises** to reinforce concepts
-- **Real-world examples** with U.S. context
-- **Progress tracking** to see your advancement
-- **Regular updates** based on user feedback
+### 🚀 How to Join Beta
 
-### Content Updates
-- **New content** added every two weeks
-- **User feedback** drives content priorities
-- **Seasonal updates** (tax season, end of year, etc.)
-- **Policy updates** when laws change
+**Quick signup process:**
 
-## Calculators & Tools
+1. 🌐 Visit ZeroFinanx.com
+2. 🎯 Click "Start Free Trial" on Education (Beta) card
+3. 📝 Complete account setup (2 minutes)
+4. 🎉 Begin your 30-day free trial immediately!
 
-### Core Calculators
+> ⏰ **Act Fast**: Beta spots are filling up quickly!
 
-#### Save/Spend Number Calculator
-**Purpose**: Determine how much to save and spend based on your income and goals
-**Inputs**: 
-- Monthly income
-- Fixed expenses
-- Financial goals
-- Timeline preferences
-**Output**: Personalized save and spend recommendations
+---
 
-#### Emergency Fund Calculator
-**Purpose**: Calculate your ideal emergency fund size
-**Inputs**:
-- Monthly essential expenses
-- Job security level
-- Family situation
-- Risk tolerance
-**Output**: Recommended emergency fund target
+[🔗 **Join Beta Program Now →**](https://zerofinanx.com)
 
-#### 401(k) Optimizer
-**Purpose**: Maximize your employer 401(k) match and contributions
-**Inputs**:
-- Salary
-- Current contribution rate
-- Employer match details
-- Other retirement savings
-**Output**: Optimal contribution strategy
+## 📚 Educational Content
 
-### How to Use Calculators
-1. **Navigate** to Tools section in your dashboard
-2. **Select** the calculator you need
-3. **Enter** your information accurately
-4. **Review** results and explanations
-5. **Save** results to track progress over time
-6. **Export** results (PDF) for your records
+### 🏗️ Content Structure
 
-### Calculator Updates
-- **Regular improvements** based on user feedback
-- **New calculators** added quarterly
-- **Seasonal tools** (tax planning, year-end review)
-- **Policy updates** when regulations change
+Our educational content is organized into three progressive tiers:
 
-## Your Learning Journey
+<details>
+<summary><strong>🏠 1. Foundation Concepts</strong> (Start Here!)</summary>
 
-### Getting Started Path
-**Week 1-2: Foundation**
-1. Complete profile setup
-2. Take financial assessment
-3. Learn your Save/Spend numbers
-4. Set up emergency fund goal
-5. Review basic budgeting concepts
+| Topic | Description | Time Investment |
+|-------|-------------|----------------|
+| 💰 **Save Number** | How much you need to save | 15 min lesson |
+| 💳 **Spend Number** | How much you can safely spend | 15 min lesson |
+| ➡️ **Next Two Actions** | Immediate steps to take | 10 min lesson |
+| 🎆 **Emergency Fund** | Building your safety net | 20 min lesson |
+| 💵 **Debt Management** | Smart debt strategies | 25 min lesson |
 
-**Week 3-4: Deep Dive**
-1. Explore retirement planning
-2. Understand tax-advantaged accounts
-3. Learn about employer benefits
-4. Create action plan
-5. Set up progress tracking
+</details>
 
-### Progress Tracking
-- **Learning milestones** with completion badges
-- **Progress dashboard** showing completed topics
-- **Action items** with due dates and reminders
-- **Goal tracking** with visual progress indicators
-- **Monthly progress reports** via email
+<details>
+<summary><strong>🇺🇸 2. U.S.-Specific Guidance</strong> (Core Knowledge)</summary>
 
-### Customized Learning
-Content is tailored based on:
-- **Your profile** information and goals
-- **Learning progress** and completed topics
-- **Areas of interest** selected during setup
-- **Engagement patterns** and preferred content types
+| Topic | Description | Time Investment |
+|-------|-------------|----------------|
+| 🏢 **401(k) & Retirement** | Employer-sponsored accounts | 30 min lesson |
+| 🏛️ **Tax-Advantaged Savings** | IRA, HSA strategies | 25 min lesson |
+| 👥 **Social Security** | Planning for benefits | 30 min lesson |
+| 🏥 **Healthcare & Insurance** | Managing medical costs | 25 min lesson |
+| 📋 **Tax Planning** | Smart tax strategies | 35 min lesson |
 
-### Setting Goals
-**Financial Goals Examples**:
-- Build 6-month emergency fund
-- Maximize employer 401(k) match
-- Pay off credit card debt
-- Save for home down payment
-- Plan for children's education
+</details>
 
-**Learning Goals Examples**:
-- Understand investment basics
-- Master tax planning
-- Learn real estate fundamentals
-- Explore small business finances
-- Plan for retirement
+<details>
+<summary><strong>🎩 3. Advanced Topics</strong> (Level Up)</summary>
 
-## Account Management
+| Topic | Description | Time Investment |
+|-------|-------------|----------------|
+| 📈 **Investment Fundamentals** | Building wealth basics | 45 min lesson |
+| 🏠 **Real Estate** | Property considerations | 40 min lesson |
+| 📜 **Estate Planning** | Protecting your legacy | 35 min lesson |
+| 🏢 **Small Business** | Entrepreneurial finances | 50 min lesson |
+| 🧠 **Tax Optimization** | Advanced strategies | 45 min lesson |
 
-### Dashboard Overview
-Your personal dashboard includes:
-- **Progress summary** with completion percentages
-- **Next recommended** lessons and actions
-- **Calculator shortcuts** for quick access
-- **Recent activity** and learning history
-- **Upcoming deadlines** and reminders
+</details>
 
-### Profile Settings
-**Personal Information**:
-- Update name and email
-- Change password
-- Manage notification preferences
-- Update financial goals
-- Adjust learning preferences
+### 🎨 Learning Format
 
-**Privacy Controls**:
-- Data sharing preferences
-- Email communication settings
-- Account deletion options
-- Data export requests
+> 💡 **Philosophy**: Bite-sized, actionable, U.S.-focused
+
+| Format | Details | Benefits |
+|--------|---------|----------|
+| 🧩 **Bite-sized Lessons** | 5-10 minutes each | Fits any schedule |
+| 🎯 **Interactive Exercises** | Hands-on reinforcement | Better retention |
+| 🇺🇸 **Real-world Examples** | U.S.-specific context | Immediately applicable |
+| 📈 **Progress Tracking** | Visual advancement | Stay motivated |
+| 🔄 **Regular Updates** | Fresh content | Always current |
+
+### 📅 Content Update Schedule
+
+**Regular content updates:**
+
+- 🗓️ **Every 2 Weeks**: New content added
+- 📢 **User Feedback**: Drives content priorities  
+- 🎅 **Seasonal Updates**: Tax season, year-end, etc.
+- 📜 **Policy Updates**: When laws change
+
+## 🧮 Calculators & Tools
+
+> 🎯 **Goal**: Turn complex financial decisions into simple calculations
+
+### 🔧 Core Calculators
+
+<details>
+<summary><strong>💰 Save/Spend Number Calculator</strong></summary>
+
+**🎯 Purpose**: Determine how much to save and spend based on your income and goals
+
+| Input | Details |
+|-------|----------|
+| 💵 Monthly Income | Your take-home pay |
+| 🏠 Fixed Expenses | Rent, utilities, insurance |
+| 🎯 Financial Goals | What you're saving for |
+| 📅 Timeline | When you need the money |
+
+**✨ Output**: Personalized save and spend recommendations
+
+[🔗 **Try Calculator →**](/calculators/save-calculator)
+
+</details>
+
+<details>
+<summary><strong>🎆 Emergency Fund Calculator</strong></summary>
+
+**🎯 Purpose**: Calculate your ideal emergency fund size
+
+| Input | Details |
+|-------|----------|
+| 💳 Essential Expenses | Monthly must-haves only |
+| 💼 Job Security | How stable is your income? |
+| 👨‍👩‍👧‍👦 Family Situation | Dependents, responsibilities |
+| ⚡ Risk Tolerance | Your comfort with uncertainty |
+
+**✨ Output**: Recommended emergency fund target
+
+[🔗 **Try Calculator →**](/calculators/emergency-fund)
+
+</details>
+
+<details>
+<summary><strong>🏢 401(k) Optimizer</strong></summary>
+
+**🎯 Purpose**: Maximize your employer 401(k) match and contributions
+
+| Input | Details |
+|-------|----------|
+| 💵 Salary | Your annual compensation |
+| 📈 Current Rate | What % you contribute now |
+| 🏢 Employer Match | Company matching details |
+| 💰 Other Savings | IRA, other retirement accounts |
+
+**✨ Output**: Optimal contribution strategy
+
+[🔗 **Try Calculator →**](/calculators/401k-optimizer)
+
+</details>
+
+### 📝 How to Use Calculators
+
+**Step-by-step process:**
+
+1. 🧮 Navigate to Tools section in dashboard
+2. 🎯 Select the calculator you need  
+3. ✍️ Enter your information accurately
+4. 🔍 Review results and explanations
+5. 💾 Save results to track progress
+6. 📋 Export results (PDF) for records
+
+> 💡 **Pro Tip**: Bookmark frequently used calculators for quick access!
+
+### 🔄 Calculator Updates
+
+| Frequency | Update Type | Details |
+|-----------|-------------|----------|
+| 🔄 **Regular** | User-driven improvements | Based on your feedback |
+| 📅 **Quarterly** | New calculators | Expanding tool library |
+| 🎅 **Seasonal** | Timely tools | Tax planning, year-end review |
+| 📜 **Policy** | Regulation updates | When laws change |
+
+## 🎯 Your Learning Journey
+
+> 🗺️ **Your Roadmap**: From financial confusion to confidence
+
+### 🚀 Getting Started Path
+
+<details>
+<summary><strong>🟢 Week 1-2: Foundation</strong> (Building Your Base)</summary>
+
+| Day | Task | Time | Status |
+|-----|------|------|---------|
+| 1 | 📝 Complete profile setup | 5 min | ⬜ |
+| 2-3 | 📈 Take financial assessment | 15 min | ⬜ |
+| 4-5 | 💰 Learn your Save/Spend numbers | 20 min | ⬜ |
+| 6-7 | 🎆 Set up emergency fund goal | 15 min | ⬜ |
+| 8-14 | 📋 Review basic budgeting | 30 min | ⬜ |
+
+**✨ Week 1-2 Goal**: Understand your financial baseline
+
+</details>
+
+<details>
+<summary><strong>🟡 Week 3-4: Deep Dive</strong> (Building Knowledge)</summary>
+
+| Day | Task | Time | Status |
+|-----|------|------|---------|
+| 15-17 | 🎯 Explore retirement planning | 45 min | ⬜ |
+| 18-20 | 🏛️ Tax-advantaged accounts | 35 min | ⬜ |
+| 21-23 | 🏢 Learn employer benefits | 30 min | ⬜ |
+| 24-26 | 📝 Create action plan | 25 min | ⬜ |
+| 27-28 | 📈 Set up progress tracking | 15 min | ⬜ |
+
+**✨ Week 3-4 Goal**: Create your personalized financial plan
+
+</details>
+
+### 📈 Progress Tracking
+
+> 🏆 **Gamification**: Your learning journey, visualized
+
+| Feature | Description | Benefit |
+|---------|-------------|----------|
+| 🏅 **Learning Milestones** | Completion badges | Visual achievements |
+| 📋 **Progress Dashboard** | Completed topics overview | Quick status check |
+| ✓ **Action Items** | Due dates & reminders | Stay on track |
+| 🎯 **Goal Tracking** | Visual progress bars | Motivation boost |
+| 📧 **Monthly Reports** | Progress via email | Regular check-ins |
+
+### 🎯 Customized Learning
+
+**Your experience is tailored using:**
+
+1. 📋 **Profile Info + Goals** - Your financial objectives and preferences
+2. 📈 **Learning Progress** - What you've completed and where you are
+3. 🎯 **Areas of Interest** - Topics you want to focus on
+4. 📁 **Engagement Patterns** - How you learn best
+
+**Result**: ✨ **Personalized content designed just for you**
+
+### 🎯 Setting Goals
+
+<details>
+<summary><strong>💰 Financial Goals Examples</strong></summary>
+
+| Goal | Timeline | Difficulty | Impact |
+|------|----------|------------|--------|
+| 🎆 **6-month emergency fund** | 6-12 months | 🟢 Beginner | 🔴 Critical |
+| 🏢 **Maximize 401(k) match** | 1-2 months | 🟢 Beginner | 🔴 High |
+| 💳 **Pay off credit cards** | 6-18 months | 🟡 Intermediate | 🔴 Critical |
+| 🏠 **Home down payment** | 2-5 years | 🟡 Intermediate | 🟡 Medium |
+| 🎭 **Children's education** | 5-18 years | 🔴 Advanced | 🟡 Medium |
+
+</details>
+
+<details>
+<summary><strong>📚 Learning Goals Examples</strong></summary>
+
+| Goal | Timeline | Difficulty | Benefit |
+|------|----------|------------|----------|
+| 📈 **Investment basics** | 2-4 weeks | 🟢 Beginner | Long-term wealth |
+| 📋 **Tax planning mastery** | 4-6 weeks | 🟡 Intermediate | Annual savings |
+| 🏠 **Real estate fundamentals** | 6-8 weeks | 🟡 Intermediate | Diversification |
+| 🏢 **Small business finances** | 8-12 weeks | 🔴 Advanced | Entrepreneurship |
+| 👥 **Retirement planning** | 4-8 weeks | 🟡 Intermediate | Future security |
+
+</details>
+
+> 💡 **Smart Goal Setting**: Start with 1-2 goals max. Focus beats overwhelm!
+
+## 👤 Account Management
+
+### 📋 Dashboard Overview
+
+> 🏠 **Your Command Center**: Everything you need in one place
+
+| Dashboard Section | What You'll See | Quick Actions |
+|-------------------|-----------------|----------------|
+| 📈 **Progress Summary** | Completion percentages | View detailed progress |
+| ➡️ **Next Recommended** | Suggested lessons/actions | Start learning now |
+| 🧮 **Calculator Shortcuts** | Quick tool access | Launch calculators |
+| 🗓️ **Recent Activity** | Learning history | Resume where you left off |
+| ⏰ **Upcoming Deadlines** | Goal reminders | Stay on track |
+
+### ⚙️ Profile Settings
+
+<details>
+<summary><strong>📝 Personal Information</strong></summary>
+
+- 👤 Update name and email
+- 🔐 Change password  
+- 🔔 Manage notification preferences
+- 🎯 Update financial goals
+- 🎨 Adjust learning preferences
+
+</details>
+
+<details>
+<summary><strong>🔒 Privacy Controls</strong></summary>
+
+- 📤 Data sharing preferences
+- 📧 Email communication settings
+- 🗑️ Account deletion options
+- 📊 Data export requests
+
+> 🔒 **Your Data, Your Control**: We believe in complete transparency
+
+</details>
 
 ### Notification Settings
 **Email Notifications**:
