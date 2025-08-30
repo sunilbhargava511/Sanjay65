@@ -4,11 +4,17 @@ import { Calculator } from '../route';
 // Import the same in-memory storage (in production, this would be a database)
 declare global {
   var calculators: Map<string, Calculator> | undefined;
+  var uploadedCalculators: any[] | undefined;
 }
 
 const calculators = globalThis.calculators || new Map<string, Calculator>();
 if (!globalThis.calculators) {
   globalThis.calculators = calculators;
+}
+
+const uploadedCalculators = globalThis.uploadedCalculators || [];
+if (!globalThis.uploadedCalculators) {
+  globalThis.uploadedCalculators = uploadedCalculators;
 }
 
 export async function GET(
@@ -108,15 +114,43 @@ export async function DELETE(
       );
     }
 
+    // Check both calculator stores
     const calculator = calculators.get(id);
-    if (!calculator) {
+    const uploadedCalculatorIndex = uploadedCalculators.findIndex(calc => calc.id === id);
+    
+    if (!calculator && uploadedCalculatorIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Calculator not found' },
         { status: 404 }
       );
     }
 
-    calculators.delete(id);
+    // Delete from both stores if exists
+    if (calculator) {
+      calculators.delete(id);
+    }
+    
+    if (uploadedCalculatorIndex !== -1) {
+      const uploadedCalc = uploadedCalculators[uploadedCalculatorIndex];
+      
+      // If it's a local calculator, try to delete files
+      if (uploadedCalc.type === 'local') {
+        try {
+          const { rmSync, existsSync } = await import('fs');
+          const { join } = await import('path');
+          const calculatorDir = join(process.cwd(), 'public', 'calculators', id);
+          
+          if (existsSync(calculatorDir)) {
+            rmSync(calculatorDir, { recursive: true, force: true });
+          }
+        } catch (fileError) {
+          console.error('Error deleting calculator files:', fileError);
+          // Continue with deletion from memory even if file deletion fails
+        }
+      }
+      
+      uploadedCalculators.splice(uploadedCalculatorIndex, 1);
+    }
 
     return NextResponse.json({
       success: true,
