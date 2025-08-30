@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CalculatorAnalyzer } from '../../../../lib/calculator-analyzer';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,21 +19,10 @@ export async function POST(request: NextRequest) {
     
     const name = formData.get('name') as string;
     const description = formData.get('description') as string;
-    const autoAnalyze = formData.get('autoAnalyze') === 'true';
     const file = formData.get('file') as File;
     const calculatorUrl = formData.get('url') as string;
     
-    let finalName = name;
-    let finalDescription = description;
-    
-    // If auto-analyze is enabled and name/description are empty, analyze
-    if (autoAnalyze && (!name || !description)) {
-      const analysis = await CalculatorAnalyzer.analyzeFromFormData(formData);
-      finalName = finalName || analysis.name;
-      finalDescription = finalDescription || analysis.description;
-    }
-    
-    if (!finalName || !finalDescription) {
+    if (!name || !description) {
       return NextResponse.json(
         { success: false, error: 'Name and description are required' },
         { status: 400 }
@@ -44,8 +32,8 @@ export async function POST(request: NextRequest) {
     const calculatorId = uuidv4();
     const calculator = {
       id: calculatorId,
-      name: finalName,
-      description: finalDescription,
+      name: name,
+      description: description,
       type: file ? 'local' : 'url',
       created: Date.now(),
     };
@@ -74,7 +62,7 @@ export async function POST(request: NextRequest) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${finalName}</title>
+    <title>${name}</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
