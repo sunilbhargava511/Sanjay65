@@ -19,21 +19,30 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface Lesson {
   id: string;
   title: string;
+  description: string;
   youtubeUrl: string;
   category: 'general' | 'young-adult' | 'older-adult';
-  order: number;
+  orderIndex: number;
+  duration?: string;
+  active: boolean;
+  isPublished: boolean;
+  tags?: string[];
   createdAt: string;
+  updatedAt: string;
 }
 
 interface Calculator {
   id: string;
   name: string;
   description: string;
-  type: 'file' | 'url';
-  content: string;
-  fileUrl?: string;
+  calculatorType: 'code' | 'url';
+  fileName?: string;
   externalUrl?: string;
+  orderIndex: number;
+  active: boolean;
+  isPublished: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 const nav = [
@@ -49,20 +58,46 @@ export default function AfterLoginDashboard() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [calculators, setCalculators] = useState<Calculator[]>([]);
   const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
+  const [calculatorContent, setCalculatorContent] = useState<string>('');
 
   useEffect(() => {
     // Fetch lessons
     fetch('/api/lessons')
       .then(res => res.json())
-      .then(data => setLessons(data))
+      .then(data => {
+        if (data.success && data.lessons) {
+          setLessons(data.lessons);
+        }
+      })
       .catch(console.error);
 
     // Fetch calculators
     fetch('/api/calculators')
       .then(res => res.json())
-      .then(data => setCalculators(data))
+      .then(data => {
+        if (data.success && data.calculators) {
+          setCalculators(data.calculators);
+        }
+      })
       .catch(console.error);
   }, []);
+
+  const handleCalculatorSelect = async (calculator: Calculator) => {
+    setSelectedCalculator(calculator);
+    setCalculatorContent('');
+
+    if (calculator.calculatorType === 'code' && calculator.fileName) {
+      try {
+        const response = await fetch(`/calculators/${calculator.fileName}`);
+        if (response.ok) {
+          const content = await response.text();
+          setCalculatorContent(content);
+        }
+      } catch (error) {
+        console.error('Error loading calculator content:', error);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
@@ -155,7 +190,7 @@ export default function AfterLoginDashboard() {
             >
               {active === "welcome" && <Welcome />}
               {active === "lessons" && <Lessons lessons={lessons} />}
-              {active === "calculators" && <Calculators calculators={calculators} onSelect={setSelectedCalculator} />}
+              {active === "calculators" && <Calculators calculators={calculators} onSelect={handleCalculatorSelect} />}
               {active === "feedback" && <Feedback />}
             </motion.div>
           </AnimatePresence>
@@ -177,11 +212,20 @@ export default function AfterLoginDashboard() {
               </Button>
             </div>
             <div className="p-4 overflow-auto" style={{ height: 'calc(90vh - 60px)' }}>
-              {selectedCalculator.type === 'file' ? (
-                <div dangerouslySetInnerHTML={{ __html: selectedCalculator.content }} />
+              {selectedCalculator.calculatorType === 'code' ? (
+                calculatorContent ? (
+                  <div dangerouslySetInnerHTML={{ __html: calculatorContent }} />
+                ) : (
+                  <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
+                      <p className="text-gray-600">Loading calculator...</p>
+                    </div>
+                  </div>
+                )
               ) : (
                 <iframe
-                  src={selectedCalculator.externalUrl}
+                  src={selectedCalculator.url}
                   className="w-full h-full min-h-[600px]"
                   title={selectedCalculator.name}
                 />
@@ -247,9 +291,9 @@ function Lessons({ lessons, compact = false }: { lessons: Lesson[]; compact?: bo
       }
     });
 
-    // Sort by order
+    // Sort by orderIndex
     Object.keys(grouped).forEach(key => {
-      grouped[key as keyof typeof grouped].sort((a, b) => a.order - b.order);
+      grouped[key as keyof typeof grouped].sort((a, b) => a.orderIndex - b.orderIndex);
     });
 
     return grouped;
@@ -284,7 +328,10 @@ function Lessons({ lessons, compact = false }: { lessons: Lesson[]; compact?: bo
                   <CardTitle className="text-base">{lesson.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm space-y-3">
-                  <p className="text-neutral-700">{titles[category]} lesson content</p>
+                  <p className="text-neutral-700">{lesson.description}</p>
+                  {lesson.duration && (
+                    <p className="text-xs text-neutral-500">Duration: {lesson.duration}</p>
+                  )}
                   <div className="flex items-center justify-between">
                     <Badge variant="secondary">Lesson</Badge>
                     <Button 
@@ -322,7 +369,12 @@ function Calculators({ calculators, onSelect, compact = false }: {
   onSelect: (calc: Calculator) => void;
   compact?: boolean;
 }) {
-  const groups = chunk(calculators, 3);
+  // Sort calculators by orderIndex and filter active ones
+  const sortedCalculators = calculators
+    .filter(calc => calc.active && calc.isPublished)
+    .sort((a, b) => a.orderIndex - b.orderIndex);
+  
+  const groups = chunk(sortedCalculators, 3);
 
   return (
     <div className="space-y-3 mt-4">
@@ -349,7 +401,7 @@ function Calculators({ calculators, onSelect, compact = false }: {
         </div>
       ))}
 
-      {calculators.length === 0 && (
+      {sortedCalculators.length === 0 && (
         <Card>
           <CardContent className="p-8 text-center text-neutral-500">
             No calculators available yet.
