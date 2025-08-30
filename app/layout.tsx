@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZeroFinanx",
+  title: "zerofinanx",
   description: "Zero Financial Anxiety - Educational guidance for U.S. money choices",
 };
 
