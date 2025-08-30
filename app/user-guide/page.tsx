@@ -66,25 +66,25 @@ export default function UserGuidePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
+      {/* Header - Mobile Optimized */}
       <header className="sticky top-0 z-10 border-b border-gray-100 bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <a 
               href="/" 
-              className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+              className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap"
             >
-              ← Back to Home
+              ← Home
             </a>
           </div>
-          <div className="text-center">
-            <h1 className="text-lg font-semibold tracking-tight">zerofinanx</h1>
-            <p className="text-xs text-gray-500">User Guide</p>
+          <div className="text-center flex-shrink-0">
+            <h1 className="text-base sm:text-lg font-semibold tracking-tight">zerofinanx</h1>
+            <p className="text-xs text-gray-500 hidden sm:block">User Guide</p>
           </div>
-          <nav className="flex w-24 justify-end">
+          <nav className="flex justify-end min-w-0 flex-1">
             <a
               href="/login"
-              className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-50"
+              className="inline-flex items-center rounded-lg border border-gray-300 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium text-gray-900 hover:bg-gray-50 whitespace-nowrap"
             >
               Login
             </a>
@@ -92,26 +92,26 @@ export default function UserGuidePage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-4xl px-4 py-12">
-        {/* Welcome Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{title}</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:py-12">
+        {/* Welcome Section - Mobile Optimized */}
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">{title}</h1>
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Everything you need to know to get started with ZeroFinanx and make the most of your financial education journey.
           </p>
-          <div className="mt-6">
+          <div className="mt-4 sm:mt-6">
             <a
               href="/login"
-              className="inline-flex items-center rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:opacity-90"
+              className="inline-flex items-center rounded-xl bg-gray-900 px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-white hover:opacity-90"
             >
               Start Your Free Trial
             </a>
           </div>
         </div>
 
-        {/* Content */}
+        {/* Content - Mobile Optimized */}
         <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-8">
+          <div className="p-4 sm:p-8">
             <div 
               className="prose prose-slate max-w-none
                 prose-headings:text-gray-900 
@@ -131,16 +131,16 @@ export default function UserGuidePage() {
           </div>
         </div>
 
-        {/* Call to Action */}
-        <div className="mt-12 text-center">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-8">
-            <h2 className="text-xl font-semibold text-amber-900 mb-4">Ready to Start Your Journey?</h2>
-            <p className="text-amber-800 mb-6">
+        {/* Call to Action - Mobile Optimized */}
+        <div className="mt-8 sm:mt-12 text-center">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 sm:p-8">
+            <h2 className="text-lg sm:text-xl font-semibold text-amber-900 mb-3 sm:mb-4">Ready to Start Your Journey?</h2>
+            <p className="text-amber-800 mb-4 sm:mb-6 text-sm sm:text-base">
               Join the limited beta program with 30 days free and special early-user benefits.
             </p>
             <a
               href="/login"
-              className="inline-flex items-center rounded-xl bg-amber-900 px-6 py-3 text-sm font-semibold text-white hover:opacity-90"
+              className="inline-flex items-center rounded-xl bg-amber-900 px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-white hover:opacity-90"
             >
               Start Free Trial Today
             </a>

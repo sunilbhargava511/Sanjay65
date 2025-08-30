@@ -30,28 +30,28 @@ function PaymentSuccessContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
+      {/* Header - Mobile Optimized */}
       <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-semibold">ZeroFinanx</h1>
-            <p className="text-sm text-gray-600">Zero Financial Anxiety - USA</p>
+        <div className="mx-auto max-w-6xl px-4 py-3 sm:py-4 flex items-center justify-between">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-base sm:text-lg font-semibold truncate">ZeroFinanx</h1>
+            <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Zero Financial Anxiety - USA</p>
           </div>
           <a
             href="/"
-            className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+            className="inline-flex items-center rounded-lg border border-gray-300 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-900 hover:bg-gray-50 whitespace-nowrap ml-4"
           >
             Home
           </a>
         </div>
       </header>
 
-      {/* Success Content */}
-      <main className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <div className="mb-8">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Payment Successful!</h1>
-          <p className="text-lg text-gray-600 mb-8">
+      {/* Success Content - Mobile Optimized */}
+      <main className="mx-auto max-w-2xl px-4 py-8 sm:py-16 text-center">
+        <div className="mb-6 sm:mb-8">
+          <CheckCircle className="w-12 sm:w-16 h-12 sm:h-16 text-green-500 mx-auto mb-4 sm:mb-6" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">Payment Successful!</h1>
+          <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8">
             Welcome to ZeroFinanx! Your subscription to the Education plan is now active.
           </p>
         </div>

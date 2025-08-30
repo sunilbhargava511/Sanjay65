@@ -1,7 +1,20 @@
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-white p-6 md:p-10">
-      <div className="mx-auto max-w-3xl prose prose-slate">
+    <main className="min-h-screen bg-white">
+      {/* Mobile-optimized header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
+        <div className="px-4 py-3">
+          <a 
+            href="/" 
+            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+          >
+            ← Back to Home
+          </a>
+        </div>
+      </div>
+      
+      <div className="px-4 py-6 md:p-10">
+        <div className="mx-auto max-w-3xl prose prose-slate">
         <h1>Privacy Policy</h1>
         <p><strong>Effective Date:</strong> December 2024</p>
 
