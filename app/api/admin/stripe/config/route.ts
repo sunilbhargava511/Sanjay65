@@ -9,6 +9,7 @@ let stripeConfig = {
   secretKey: '',
   publishableKey: '',
   webhookSecret: '',
+  priceId: '',
   configured: false
 };
 
@@ -19,12 +20,15 @@ export async function GET() {
       process.env.STRIPE_SECRET_KEY !== 'sk_test_your_stripe_test_secret_key_here';
     const hasPublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && 
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY !== 'pk_test_your_stripe_test_publishable_key_here';
+    const hasPriceId = process.env.STRIPE_PRICE_ID && 
+      process.env.STRIPE_PRICE_ID !== 'price_your_stripe_price_id_here';
     
     if (hasSecretKey && hasPublishableKey) {
       return NextResponse.json({
         secretKey: '••••••••••••••••', // Masked for security
         publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-        webhookSecret: '••••••••••••••••', // Masked for security
+        webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ? '••••••••••••••••' : '', // Masked for security
+        priceId: process.env.STRIPE_PRICE_ID || '',
         configured: true
       });
     }
@@ -34,6 +38,7 @@ export async function GET() {
       secretKey: stripeConfig.secretKey ? '••••••••••••••••' : '',
       publishableKey: stripeConfig.publishableKey,
       webhookSecret: stripeConfig.webhookSecret ? '••••••••••••••••' : '',
+      priceId: stripeConfig.priceId,
       configured: stripeConfig.configured
     });
   } catch (error) {
@@ -47,7 +52,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { secretKey, publishableKey, webhookSecret } = body;
+    const { secretKey, publishableKey, webhookSecret, priceId } = body;
 
     if (!secretKey || !publishableKey) {
       return NextResponse.json(
@@ -82,6 +87,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate price ID format if provided
+    if (priceId && !priceId.startsWith('price_')) {
+      return NextResponse.json(
+        { error: 'Invalid price ID format. Must start with "price_"' },
+        { status: 400 }
+      );
+    }
+
     // Update environment file
     try {
       let envContent = '';
@@ -95,6 +108,7 @@ export async function POST(request: NextRequest) {
       let foundSecret = false;
       let foundPublishable = false;
       let foundWebhook = false;
+      let foundPriceId = false;
 
       for (const line of lines) {
         if (line.startsWith('STRIPE_SECRET_KEY=')) {
@@ -106,6 +120,9 @@ export async function POST(request: NextRequest) {
         } else if (line.startsWith('STRIPE_WEBHOOK_SECRET=')) {
           updatedLines.push(`STRIPE_WEBHOOK_SECRET=${webhookSecret || ''}`);
           foundWebhook = true;
+        } else if (line.startsWith('STRIPE_PRICE_ID=')) {
+          updatedLines.push(`STRIPE_PRICE_ID=${priceId || ''}`);
+          foundPriceId = true;
         } else {
           updatedLines.push(line);
         }
@@ -121,6 +138,9 @@ export async function POST(request: NextRequest) {
       if (!foundWebhook && webhookSecret) {
         updatedLines.push(`STRIPE_WEBHOOK_SECRET=${webhookSecret}`);
       }
+      if (!foundPriceId && priceId) {
+        updatedLines.push(`STRIPE_PRICE_ID=${priceId}`);
+      }
 
       writeFileSync(ENV_PATH, updatedLines.join('\n'));
 
@@ -129,6 +149,7 @@ export async function POST(request: NextRequest) {
         secretKey,
         publishableKey,
         webhookSecret: webhookSecret || '',
+        priceId: priceId || '',
         configured: true
       };
 
@@ -146,6 +167,7 @@ export async function POST(request: NextRequest) {
         secretKey,
         publishableKey,
         webhookSecret: webhookSecret || '',
+        priceId: priceId || '',
         configured: true
       };
 
