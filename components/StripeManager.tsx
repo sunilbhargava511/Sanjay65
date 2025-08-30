@@ -11,7 +11,8 @@ import {
   X,
   RefreshCw,
   ExternalLink,
-  AlertCircle
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 
 interface StripeAnalytics {
@@ -61,12 +62,20 @@ interface Customer {
 }
 
 export default function StripeManager() {
-  const [activeView, setActiveView] = useState<'analytics' | 'customers'>('analytics');
+  const [activeView, setActiveView] = useState<'config' | 'analytics' | 'customers'>('config');
   const [analytics, setAnalytics] = useState<StripeAnalytics | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState(30);
+  const [stripeConfigured, setStripeConfigured] = useState(false);
+  const [configLoading, setConfigLoading] = useState(false);
+  const [stripeConfig, setStripeConfig] = useState({
+    secretKey: '',
+    publishableKey: '',
+    webhookSecret: ''
+  });
+  const [testingConnection, setTestingConnection] = useState(false);
 
   const loadAnalytics = async () => {
     setLoading(true);
@@ -118,10 +127,84 @@ export default function StripeManager() {
     }
   };
 
+  const loadStripeConfig = async () => {
+    setConfigLoading(true);
+    try {
+      const response = await fetch('/api/admin/stripe/config');
+      if (response.ok) {
+        const data = await response.json();
+        setStripeConfig(data);
+        setStripeConfigured(data.configured || false);
+      }
+    } catch (err) {
+      console.error('Failed to load Stripe config:', err);
+    } finally {
+      setConfigLoading(false);
+    }
+  };
+
+  const saveStripeConfig = async () => {
+    setConfigLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/admin/stripe/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(stripeConfig),
+      });
+
+      if (!response.ok) throw new Error('Failed to save Stripe configuration');
+      
+      const data = await response.json();
+      setStripeConfigured(data.configured);
+      alert('Stripe configuration saved successfully!');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save configuration');
+    } finally {
+      setConfigLoading(false);
+    }
+  };
+
+  const testStripeConnection = async () => {
+    if (!stripeConfig.secretKey) {
+      setError('Secret key is required to test connection');
+      return;
+    }
+
+    setTestingConnection(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/admin/stripe/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ secretKey: stripeConfig.secretKey }),
+      });
+
+      if (!response.ok) throw new Error('Failed to test Stripe connection');
+      
+      const data = await response.json();
+      if (data.success) {
+        alert('Stripe connection test successful!');
+      } else {
+        throw new Error(data.error || 'Connection test failed');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Connection test failed');
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
   useEffect(() => {
-    if (activeView === 'analytics') {
+    if (activeView === 'config') {
+      loadStripeConfig();
+    } else if (activeView === 'analytics') {
       loadAnalytics();
-    } else {
+    } else if (activeView === 'customers') {
       loadCustomers();
     }
   }, [activeView, selectedPeriod]);
@@ -179,6 +262,16 @@ export default function StripeManager() {
         {/* Navigation */}
         <div className="flex gap-4 mt-4">
           <button
+            onClick={() => setActiveView('config')}
+            className={`px-3 py-2 text-sm font-medium border-b-2 transition ${
+              activeView === 'config'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Configuration
+          </button>
+          <button
             onClick={() => setActiveView('analytics')}
             className={`px-3 py-2 text-sm font-medium border-b-2 transition ${
               activeView === 'analytics'
@@ -207,6 +300,123 @@ export default function StripeManager() {
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-red-600" />
             <span className="text-red-800">{error}</span>
+          </div>
+        )}
+
+        {activeView === 'config' && (
+          <div className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="font-semibold text-blue-900 mb-2">Stripe Configuration</h3>
+              <p className="text-sm text-blue-800">
+                Configure your Stripe API keys to enable payment processing. You can find these in your{' '}
+                <a 
+                  href="https://dashboard.stripe.com/apikeys" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  Stripe Dashboard
+                </a>.
+              </p>
+            </div>
+
+            {!stripeConfigured && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-yellow-600" />
+                  <span className="font-medium text-yellow-800">Setup Required</span>
+                </div>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Stripe is not configured. Payment processing is currently disabled.
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Secret Key
+                </label>
+                <input
+                  type="password"
+                  value={stripeConfig.secretKey}
+                  onChange={(e) => setStripeConfig(prev => ({ ...prev, secretKey: e.target.value }))}
+                  placeholder="sk_test_... or sk_live_..."
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Used for server-side API calls. Starts with sk_test_ or sk_live_
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Publishable Key
+                </label>
+                <input
+                  type="text"
+                  value={stripeConfig.publishableKey}
+                  onChange={(e) => setStripeConfig(prev => ({ ...prev, publishableKey: e.target.value }))}
+                  placeholder="pk_test_... or pk_live_..."
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Used for client-side checkout. Starts with pk_test_ or pk_live_
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Webhook Secret
+                </label>
+                <input
+                  type="password"
+                  value={stripeConfig.webhookSecret}
+                  onChange={(e) => setStripeConfig(prev => ({ ...prev, webhookSecret: e.target.value }))}
+                  placeholder="whsec_..."
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Used to verify webhook signatures. Starts with whsec_
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={saveStripeConfig}
+                  disabled={configLoading || !stripeConfig.secretKey || !stripeConfig.publishableKey}
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {configLoading ? (
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  ) : null}
+                  Save Configuration
+                </button>
+                
+                <button
+                  onClick={testStripeConnection}
+                  disabled={testingConnection || !stripeConfig.secretKey}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {testingConnection ? (
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  ) : null}
+                  Test Connection
+                </button>
+              </div>
+            </div>
+
+            {stripeConfigured && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="font-medium text-green-800">Configuration Active</span>
+                </div>
+                <p className="text-sm text-green-700 mt-1">
+                  Stripe is configured and ready for payments. You can now access Analytics and Customer Management.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
