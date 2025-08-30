@@ -36,6 +36,7 @@ export default function PrivacyPage() {
 
         <h2>5. Updates</h2>
         <p>We may update this policy from time to time. If changes are significant, we'll notify you by email.</p>
+        </div>
       </div>
     </main>
   );

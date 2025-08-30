@@ -35,6 +35,7 @@ export default function TermsPage() {
 
         <h2>4. Updates</h2>
         <p>We may update these Terms from time to time. If changes are significant, we'll notify you by email.</p>
+        </div>
       </div>
     </main>
   );
