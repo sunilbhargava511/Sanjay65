@@ -124,36 +124,40 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-white px-3 text-xs text-slate-500">or sign in with email</span>
-            </div>
-          </div>
+{process.env.NEXT_PUBLIC_EMAIL_ENABLED && (
+            <>
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                  <div className="w-full border-t border-slate-200" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-3 text-xs text-slate-500">or sign in with email</span>
+                </div>
+              </div>
 
-          <form onSubmit={handleMagicLink} className="grid gap-4">
-            <div className="grid gap-2">
-              <label htmlFor="email" className="text-sm font-medium text-slate-700">Email</label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 outline-none focus:ring-2 focus:ring-slate-300"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={!accepted || isSubmitting}
-              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50 disabled:opacity-60"
-            >
-              Email me a magic link
-            </button>
-          </form>
+              <form onSubmit={handleMagicLink} className="grid gap-4">
+                <div className="grid gap-2">
+                  <label htmlFor="email" className="text-sm font-medium text-slate-700">Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 outline-none focus:ring-2 focus:ring-slate-300"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!accepted || isSubmitting}
+                  className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50 disabled:opacity-60"
+                >
+                  Email me a magic link
+                </button>
+              </form>
+            </>
+          )}
 
           {message && (
             <div className="mt-4 rounded-xl bg-slate-50 border border-slate-200 p-3 text-sm text-slate-700">

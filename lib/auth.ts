@@ -16,10 +16,11 @@ export const authOptions: NextAuthOptions = {
       privateKey: (process.env.APPLE_PRIVATE_KEY ?? "").replace(/\\n/g, "\n"),
       keyId: process.env.APPLE_KEY_ID ?? "",
     }),
-    EmailProvider({
-      server: process.env.EMAIL_SERVER ?? "",
+    // Only add email provider if EMAIL_SERVER is configured
+    ...(process.env.EMAIL_SERVER ? [EmailProvider({
+      server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM ?? "ZeroFinanx <noreply@zerofinanx.com>",
-    }),
+    })] : []),
   ],
   pages: {
     signIn: "/login",
