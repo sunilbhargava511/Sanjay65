@@ -5,6 +5,94 @@ import LessonManager from '@/components/LessonManager';
 import StripeManager from '@/components/StripeManager';
 import CalculatorUpload from '@/components/CalculatorUpload';
 
+// Admin Guide Content Component
+function AdminGuideContent() {
+  const [content, setContent] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const loadGuide = async () => {
+    try {
+      const response = await fetch('/api/docs/admin-guide');
+      const data = await response.json();
+      
+      if (response.ok) {
+        setContent(data.content);
+      } else {
+        setError(data.error || 'Failed to load admin guide');
+      }
+    } catch (err) {
+      setError('Failed to load admin guide');
+      console.error('Error loading admin guide:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadGuide();
+  }, []);
+
+  const convertMarkdownToHtml = (markdown: string) => {
+    return markdown
+      .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-gray-900 mb-4 mt-6">$1</h1>')
+      .replace(/^## (.+)$/gm, '<h2 class="text-xl font-semibold text-gray-900 mb-3 mt-5">$2</h2>')
+      .replace(/^### (.+)$/gm, '<h3 class="text-lg font-medium text-gray-900 mb-2 mt-4">$3</h3>')
+      .replace(/^\* (.+)$/gm, '<li class="ml-4 mb-1">$1</li>')
+      .replace(/^(\d+)\. (.+)$/gm, '<li class="ml-4 mb-1">$2</li>')
+      .replace(/`([^`]+)`/g, '<code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">$1</code>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+      .replace(/^(.+)$/gm, '<p class="mb-3">$1</p>')
+      .replace(/<p class="mb-3"><li/g, '<ul><li')
+      .replace(/<\/li><\/p>/g, '</li></ul>')
+      .replace(/<\/ul>\s*<ul>/g, '');
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mb-4"></div>
+          <p className="text-gray-600">Loading admin guide...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl border border-red-200 shadow-sm p-8">
+        <div className="text-center">
+          <div className="text-red-400 mb-4 text-4xl">⚠️</div>
+          <h2 className="text-lg font-semibold text-red-900 mb-2">Error Loading Guide</h2>
+          <p className="text-red-700 mb-4">{error}</p>
+          <button
+            onClick={loadGuide}
+            className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div className="p-6 border-b border-gray-200">
+        <h1 className="text-xl font-bold text-gray-900">Admin Configuration & Operations Guide</h1>
+        <p className="text-gray-600 text-sm mt-1">Complete setup and management instructions</p>
+      </div>
+      <div className="p-6">
+        <div 
+          className="prose prose-sm max-w-none"
+          dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(content) }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // Calculator Management Component
 function CalculatorManagement() {
   const [calculators, setCalculators] = useState<any[]>([]);
@@ -156,7 +244,7 @@ export default function AdminLoginPage() {
   const [accessCode, setAccessCode] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'lessons' | 'calculators' | 'stripe'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'lessons' | 'calculators' | 'stripe' | 'guide'>('dashboard');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -242,6 +330,16 @@ export default function AdminLoginPage() {
                 }`}
               >
                 Stripe
+              </button>
+              <button
+                onClick={() => setActiveTab('guide')}
+                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium border-b-2 transition whitespace-nowrap ${
+                  activeTab === 'guide'
+                    ? 'border-red-600 text-red-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Admin Guide
               </button>
             </div>
           </div>
@@ -345,6 +443,10 @@ export default function AdminLoginPage() {
 
           {activeTab === 'stripe' && (
             <StripeManager />
+          )}
+
+          {activeTab === 'guide' && (
+            <AdminGuideContent />
           )}
         </main>
       </div>

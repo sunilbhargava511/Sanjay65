@@ -256,6 +256,7 @@ export default function ZeroFinanxPricingPage() {
             zerofinanx provides educational content and tools. It is <span className="font-semibold">not</span> investment, legal, tax, or accounting advice. Consult a qualified professional before acting.
           </p>
           <div className="mt-3 flex items-center justify-center gap-4">
+            <a href="/user-guide" className="underline underline-offset-2 hover:no-underline">User Guide</a>
             <a href="/admin/login" className="underline underline-offset-2 hover:no-underline">Admin Login</a>
             <button type="button" onClick={() => setShowBetaTerms(true)} className="underline underline-offset-2 hover:no-underline">Beta Terms</button>
           </div>
