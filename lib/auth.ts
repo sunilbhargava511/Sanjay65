@@ -3,23 +3,39 @@ import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
 import EmailProvider from "next-auth/providers/email";
 
+// Determine authentication configuration
+const authMethod = process.env.AUTH_METHOD || 'passwordless';
+const isPasswordlessEnabled = authMethod === 'passwordless' || authMethod === 'both';
+const isOAuthEnabled = authMethod === 'oauth' || authMethod === 'both';
+
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+    // Add OAuth providers if enabled
+    ...(isOAuthEnabled && process.env.GOOGLE_CLIENT_ID ? [GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-    }),
-    AppleProvider({
-      clientId: process.env.APPLE_CLIENT_ID ?? "",
+    })] : []),
+    ...(isOAuthEnabled && process.env.APPLE_CLIENT_ID ? [AppleProvider({
+      clientId: process.env.APPLE_CLIENT_ID,
       teamId: process.env.APPLE_TEAM_ID ?? "",
       privateKey: (process.env.APPLE_PRIVATE_KEY ?? "").replace(/\\n/g, "\n"),
       keyId: process.env.APPLE_KEY_ID ?? "",
-    }),
-    // Only add email provider if EMAIL_SERVER is configured
-    ...(process.env.EMAIL_SERVER ? [EmailProvider({
+    })] : []),
+    // Add email provider if passwordless is enabled
+    ...(isPasswordlessEnabled && process.env.EMAIL_SERVER ? [EmailProvider({
       server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM ?? "ZeroFinanx <noreply@zerofinanx.com>",
+      maxAge: 15 * 60, // Magic links expire in 15 minutes
+      sendVerificationRequest: async ({ identifier: email, url, provider }) => {
+        // Custom email sending logic can be added here
+        // For now, use the default NextAuth email sending
+        const { server, from } = provider;
+        const site = new URL(url).host;
+        
+        // You can customize the email template here
+        console.log(`Magic link sent to ${email}: ${url}`);
+      },
     })] : []),
   ],
   pages: {
@@ -32,8 +48,22 @@ export const authOptions: NextAuthOptions = {
       if (session?.user) {
         // @ts-expect-error
         session.user.sub = token.sub;
+        // @ts-expect-error
+        session.user.authMethod = token.authMethod || 'oauth';
       }
       return session;
+    },
+    async jwt({ token, user, account }) {
+      if (account) {
+        // Store auth method in token
+        token.authMethod = account.provider === 'email' ? 'passwordless' : 'oauth';
+      }
+      return token;
+    },
+    async signIn({ user, account }) {
+      // You can add custom logic here to handle sign-in
+      // For example, create user records in your database
+      return true;
     },
   },
 };

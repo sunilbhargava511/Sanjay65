@@ -1,54 +1,94 @@
 'use client';
 
-import React, { useState } from 'react';
-import { isValidEmail, normalizeEmail, enableGuestAuth } from '@/lib/cookies';
+import React, { useState, useEffect } from 'react';
+import { setGuestCookie, getStoredEmail, areCookiesEnabled } from '@/lib/guest-cookie';
 
 interface EmailGateProps {
-  onGuestProceed: (email: string) => void;
-  onExistingUserProceed?: (email: string) => void;
+  onProceed: (email: string) => void;
+  onCancel?: () => void;
 }
 
-export default function EmailGate({ onGuestProceed, onExistingUserProceed }: EmailGateProps) {
+export default function EmailGate({ onProceed, onCancel }: EmailGateProps) {
   const [email, setEmail] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [cookiesEnabled, setCookiesEnabled] = useState(true);
+
+  useEffect(() => {
+    // Check if cookies are enabled
+    setCookiesEnabled(areCookiesEnabled());
+    
+    // Check for stored email
+    const storedEmail = getStoredEmail();
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+  }, []);
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    const normalizedEmail = normalizeEmail(email);
-    
-    if (!isValidEmail(normalizedEmail)) {
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+
+    if (!validateEmail(email)) {
       setError('Please enter a valid email address');
       return;
     }
 
+    // Store email in cookie for future visits
+    setGuestCookie({ email, allowed: true });
     setShowBenefits(true);
   };
 
-  const handleGuestProceed = async () => {
+  const handleProceed = async () => {
     setIsLoading(true);
-    const normalizedEmail = normalizeEmail(email);
     
     try {
-      // Enable guest authentication
-      enableGuestAuth(normalizedEmail);
-      onGuestProceed(normalizedEmail);
+      onProceed(email);
     } catch (error) {
-      console.error('Failed to enable guest auth:', error);
+      console.error('Failed to proceed:', error);
       setError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleExistingUserProceed = () => {
-    if (onExistingUserProceed) {
-      onExistingUserProceed(normalizeEmail(email));
-    }
-  };
+  if (!cookiesEnabled) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center px-4">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-red-100 text-red-600 mb-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Cookies Required</h2>
+            <p className="text-sm text-slate-600 mb-4">
+              This application requires cookies to be enabled for authentication. 
+              Please enable cookies in your browser settings and refresh the page.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-medium hover:bg-slate-800"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (showBenefits) {
     return (
@@ -84,19 +124,19 @@ export default function EmailGate({ onGuestProceed, onExistingUserProceed }: Ema
 
             <div className="space-y-3">
               <button
-                onClick={handleGuestProceed}
+                onClick={handleProceed}
                 disabled={isLoading}
                 className="w-full bg-gray-900 text-white rounded-lg px-4 py-3 font-semibold hover:opacity-90 transition disabled:opacity-50"
               >
-                {isLoading ? 'Setting up...' : 'Continue to ZeroFinanx'}
+                {isLoading ? 'Setting up...' : 'Continue with Passwordless Access'}
               </button>
 
-              {onExistingUserProceed && (
+              {onCancel && (
                 <button
-                  onClick={handleExistingUserProceed}
+                  onClick={onCancel}
                   className="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-3 font-semibold hover:bg-gray-50 transition"
                 >
-                  I have existing account access
+                  Use Different Method
                 </button>
               )}
 

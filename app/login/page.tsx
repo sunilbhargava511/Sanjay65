@@ -1,8 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
 import AfterLoginDashboard from '@/components/AfterLoginDashboard';
+import EmailGate from '@/components/EmailGate';
+import { getStoredEmail, setGuestCookie } from '@/lib/guest-cookie';
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
@@ -10,6 +12,31 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'passwordless' | 'oauth' | null>(null);
+  const [showEmailGate, setShowEmailGate] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check stored email from cookie
+    const storedEmail = getStoredEmail();
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+
+    // Determine auth method based on configuration
+    const defaultMethod = process.env.NEXT_PUBLIC_AUTH_DEFAULT_METHOD || 'passwordless';
+    const authConfig = process.env.NEXT_PUBLIC_AUTH_METHOD || 'passwordless';
+    
+    if (authConfig === 'passwordless') {
+      setAuthMethod('passwordless');
+    } else if (authConfig === 'oauth') {
+      setAuthMethod('oauth');
+    } else {
+      // Both methods available, use default
+      setAuthMethod(defaultMethod as 'passwordless' | 'oauth');
+    }
+    setLoading(false);
+  }, []);
 
   // If user is authenticated, show dashboard
   if (status === "authenticated" && session) {
@@ -17,7 +44,7 @@ export default function LoginPage() {
   }
 
   // Loading state
-  if (status === "loading") {
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -48,8 +75,8 @@ export default function LoginPage() {
     }
   }
 
-  async function handleMagicLink(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleMagicLink(e?: React.FormEvent) {
+    if (e) e.preventDefault();
     if (!mustAccept()) return;
     if (!email) {
       setMessage("Please enter your email to receive a magic link.");
@@ -58,13 +85,40 @@ export default function LoginPage() {
     setIsSubmitting(true);
     setMessage(null);
     try {
-      await signIn("email", { email, callbackUrl: "/paywall" });
-      setMessage("Check your inbox for a sign-in link from ZeroFinanx. After you click it, you'll be taken to the paywall to start your 30-day trial.");
+      // Store email in cookie for future visits
+      setGuestCookie({ email, allowed: true });
+      
+      // Send magic link
+      const response = await fetch('/api/auth/magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMessage("Check your inbox for a sign-in link from ZeroFinanx. The link will expire in 15 minutes.");
+      } else {
+        setMessage(data.error || "Couldn't send a magic link. Please try again.");
+      }
     } catch (err) {
       setMessage("Couldn't send a magic link. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  function handleEmailGateProceed(userEmail: string) {
+    setEmail(userEmail);
+    setShowEmailGate(false);
+    setAccepted(true);
+    handleMagicLink();
+  }
+
+  function handleEmailGateCancel() {
+    setShowEmailGate(false);
+    setAuthMethod('oauth');
   }
 
   return (
