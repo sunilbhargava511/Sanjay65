@@ -49,6 +49,20 @@ export default function LessonsManagement() {
     loadLessons();
   }, []);
 
+  // Handle escape key and click outside to close modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showAddModal) {
+        handleCloseModal();
+      }
+    };
+
+    if (showAddModal) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [showAddModal]);
+
   const loadLessons = async () => {
     try {
       const response = await fetch('/api/lessons');
@@ -239,7 +253,7 @@ export default function LessonsManagement() {
                     </button>
                   </div>
                   <Link
-                    href="/learn"
+                    href={`/learn?lesson=${lesson.id}`}
                     className="inline-flex items-center gap-1 text-purple-600 text-sm hover:text-purple-800"
                   >
                     <Eye className="h-4 w-4" />
@@ -253,7 +267,14 @@ export default function LessonsManagement() {
 
         {/* Add/Edit Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                handleCloseModal();
+              }
+            }}
+          >
             <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-gray-200">
                 <h2 className="text-xl font-semibold">
