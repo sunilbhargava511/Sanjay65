@@ -3,6 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 
+// Force this page to be dynamic - it's an admin panel
+export const dynamic = 'force-dynamic';
+
 export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">

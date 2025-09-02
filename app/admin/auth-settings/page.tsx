@@ -28,6 +28,9 @@ interface AuthConfig {
   defaultMethod: 'oauth' | 'passwordless';
 }
 
+// Force this page to be dynamic - it needs to make API calls
+export const dynamic = 'force-dynamic';
+
 export default function AuthSettingsPage() {
   const [config, setConfig] = useState<AuthConfig | null>(null);
   const [loading, setLoading] = useState(true);
