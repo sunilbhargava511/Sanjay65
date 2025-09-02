@@ -35,7 +35,13 @@ export async function POST(request: NextRequest) {
     magicLinkTokens.set(token, { email, expires });
     
     // Generate magic link URL
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+    let baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    
+    // If NEXTAUTH_URL is not set but VERCEL_URL is available, use it with https
+    if (!process.env.NEXTAUTH_URL && process.env.VERCEL_URL) {
+      baseUrl = `https://${process.env.VERCEL_URL}`;
+    }
+    
     const magicLink = `${baseUrl}/api/auth/verify-magic-link?token=${token}`;
     
     // For testing/development, always show the magic link in the response
