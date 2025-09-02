@@ -36,12 +36,30 @@ export async function POST(request: NextRequest) {
         throw new Error('Invalid plan type');
     }
 
-    // Get the base URL for redirect URLs
-    const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL 
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-      : process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:3000'
-      : 'https://zerofinanx-website-4v1gdyzum-sunils-projects-7b08a1e8.vercel.app';
+    // Get the base URL for redirect URLs with robust URL construction
+    let baseUrl = 'http://localhost:3000'; // Default fallback
+    
+    // First try NEXTAUTH_URL (our configured base URL)
+    if (process.env.NEXTAUTH_URL) {
+      baseUrl = process.env.NEXTAUTH_URL.trim();
+      // Clean any duplicate protocols
+      if (baseUrl.startsWith('https://https://') || baseUrl.startsWith('http://https://')) {
+        baseUrl = baseUrl.replace(/^https?:\/\//, '');
+      }
+      // Ensure it starts with protocol
+      if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+        baseUrl = `https://${baseUrl}`;
+      }
+    }
+    // Fallback to VERCEL_URL if available  
+    else if (process.env.VERCEL_URL) {
+      const vercelUrl = process.env.VERCEL_URL.trim();
+      baseUrl = vercelUrl.startsWith('http') ? vercelUrl : `https://${vercelUrl}`;
+    }
+    // Development fallback
+    else if (process.env.NODE_ENV === 'development') {
+      baseUrl = 'http://localhost:3003'; // Match our current dev port
+    }
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
