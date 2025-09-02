@@ -54,24 +54,32 @@ function PricingCard({
   return (
     <div
       className={
-        "relative flex flex-col justify-between rounded-2xl border shadow-sm p-6 md:p-8 bg-white " +
-        (highlight ? "border-gray-900 shadow-lg" : "border-gray-200")
+        "relative flex flex-col justify-between rounded-2xl border shadow-sm p-6 md:p-8 " +
+        (highlight 
+          ? "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-xl ring-1 ring-blue-200" 
+          : "bg-white border-gray-200")
       }
     >
       {(highlight || badge) && (
-        <div className="absolute -top-3 right-6 select-none rounded-full bg-black px-3 py-1 text-xs font-medium text-white">{badge || 'Popular'}</div>
+        <div className={`absolute -top-3 right-6 select-none rounded-full px-3 py-1 text-xs font-medium text-white ${
+          highlight ? "bg-gradient-to-r from-blue-500 to-indigo-600" : "bg-black"
+        }`}>{badge || 'Popular'}</div>
       )}
       <div>
         <h3 className="text-xl font-semibold tracking-tight">{name}</h3>
         <p className="mt-2 text-sm text-gray-600">{blurb}</p>
         <div className="mt-6 flex items-end gap-2">
-          <span className="text-4xl font-bold tracking-tight">{priceLabel ? priceLabel : `$${price.toLocaleString()}`}</span>
+          <span className={`text-4xl font-bold tracking-tight ${
+            highlight ? "bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent" : ""
+          }`}>{priceLabel ? priceLabel : `$${price.toLocaleString()}`}</span>
           {!priceLabel && <span className="mb-1 text-sm text-gray-600">{suffix}</span>}
         </div>
         <ul className="mt-6 space-y-2 text-sm">
           {(featuresByPlan[name] || []).map((f) => (
             <li key={f} className="flex items-start gap-2">
-              <span aria-hidden="true" className="mt-1 h-2 w-2 rounded-full bg-gray-900" />
+              <span aria-hidden="true" className={`mt-1 h-2 w-2 rounded-full ${
+                highlight ? "bg-gradient-to-r from-blue-500 to-indigo-600" : "bg-gray-900"
+              }`} />
               <span className="text-gray-800">{f}</span>
             </li>
           ))}
@@ -84,7 +92,7 @@ function PricingCard({
         className={
           "mt-8 inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm font-semibold transition active:scale-[0.98] " +
           (highlight
-            ? "bg-gray-900 text-white border-gray-900 hover:opacity-90"
+            ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-transparent hover:from-blue-600 hover:to-indigo-700 shadow-lg"
             : "bg-white text-gray-900 border-gray-300 hover:bg-gray-50") +
           (disabled ? " opacity-60 pointer-events-none" : "")
         }
