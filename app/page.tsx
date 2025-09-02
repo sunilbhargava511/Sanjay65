@@ -205,7 +205,7 @@ export default function ZeroFinanxPricingPage() {
         <section className="mx-auto mt-6 grid max-w-4xl grid-cols-1 gap-3 text-sm md:grid-cols-3">
           <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center shadow-sm">Save Number - Spend Number - Next Two Actions</div>
           <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center shadow-sm">U.S.-focused - No sales calls</div>
-          <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center shadow-sm">Education, not advice – 30-day free trial → $100 one-time</div>
+          <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center shadow-sm">Education, not advice – Completely free</div>
         </section>
 
         {/* Philosophy strip */}
@@ -229,10 +229,10 @@ export default function ZeroFinanxPricingPage() {
           <div>
             <PricingCard
               name="Education (Beta)"
-              priceLabel="Free 30 days"
-              blurb="Then $100 one-time. Bite-sized lessons and calculators (Save/Spend Numbers). U.S.-focused. No sales calls."
+              priceLabel="Free"
+              blurb="Bite-sized lessons and calculators (Save/Spend Numbers). U.S.-focused. No sales calls."
               highlight
-              ctaLabel="Start Free Trial"
+              ctaLabel="Start Free"
               showToggle={false}
               badge="Limited Beta — 100 spots"
             />
@@ -242,17 +242,14 @@ export default function ZeroFinanxPricingPage() {
           </div>
 
           <div>
-            <PricingCard
+            <RoadmapCard
               name="Internet Advice - Customized ZeroFinanx AI + Email"
-              priceMonthly={100}
-              priceYearly={1000}
+              priceLabel="$1,000/yr"
               blurb="100/1000 internet advice customized by ZeroFinanx AI with email interaction."
+              badge="Planned"
+              footnote="Will require 203(e) SEC registration."
               ctaLabel="Q1 2026"
-              disabled
-              showToggle={false}
-              badge="Roadmap"
             />
-            <p className="mt-3 text-xs text-gray-500">Will require 203(e) SEC registration.</p>
           </div>
 
           <RoadmapCard
