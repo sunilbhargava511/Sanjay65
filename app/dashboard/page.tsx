@@ -83,22 +83,58 @@ export default function Dashboard() {
   const [topicSuggestion, setTopicSuggestion] = useState('');
   const [topicSubmitted, setTopicSubmitted] = useState(false);
 
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send to an API
-    console.log('Feedback submitted:', feedbackText);
-    setFeedbackSubmitted(true);
-    setFeedbackText('');
-    setTimeout(() => setFeedbackSubmitted(false), 3000);
+    try {
+      const response = await fetch('/api/admin/stats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'feedback',
+          content: feedbackText,
+          userEmail: userEmail
+        }),
+      });
+      
+      if (response.ok) {
+        setFeedbackSubmitted(true);
+        setFeedbackText('');
+        setTimeout(() => setFeedbackSubmitted(false), 3000);
+      } else {
+        console.error('Failed to submit feedback');
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+    }
   };
 
-  const handleTopicSubmit = (e: React.FormEvent) => {
+  const handleTopicSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send to an API
-    console.log('Topic suggested:', topicSuggestion);
-    setTopicSubmitted(true);
-    setTopicSuggestion('');
-    setTimeout(() => setTopicSubmitted(false), 3000);
+    try {
+      const response = await fetch('/api/admin/stats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'topic_suggestion',
+          content: topicSuggestion,
+          userEmail: userEmail
+        }),
+      });
+      
+      if (response.ok) {
+        setTopicSubmitted(true);
+        setTopicSuggestion('');
+        setTimeout(() => setTopicSubmitted(false), 3000);
+      } else {
+        console.error('Failed to submit topic suggestion');
+      }
+    } catch (error) {
+      console.error('Error submitting topic suggestion:', error);
+    }
   };
 
   if (loading) {
