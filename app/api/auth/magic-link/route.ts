@@ -38,27 +38,17 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL || 'http://localhost:3000';
     const magicLink = `${baseUrl}/api/auth/verify-magic-link?token=${token}`;
     
-    // If email server is configured, send email
-    if (process.env.EMAIL_SERVER) {
-      // In production, use a proper email service
-      // For now, we'll use the NextAuth email provider configuration
-      console.log(`Magic link for ${email}: ${magicLink}`);
-      
-      // You would send the email here using your email service
-      // Example with nodemailer or similar service
-      
-      return NextResponse.json({
-        success: true,
-        message: 'Magic link sent to your email'
-      });
-    } else {
-      // For development/testing, return the link directly
-      return NextResponse.json({
-        success: true,
-        message: 'Magic link generated',
-        magicLink: process.env.NODE_ENV === 'development' ? magicLink : undefined
-      });
-    }
+    // For testing/development, always show the magic link in the response
+    // In production, you would send this via email instead
+    console.log(`Magic link for ${email}: ${magicLink}`);
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Magic link generated successfully',
+      magicLink: magicLink, // Always return the link for testing
+      email: email,
+      expiresIn: '15 minutes'
+    });
     
   } catch (error) {
     console.error('Error sending magic link:', error);

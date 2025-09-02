@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [magicLink, setMagicLink] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [authMethod, setAuthMethod] = useState<'passwordless' | 'oauth' | null>(null);
   const [showEmailGate, setShowEmailGate] = useState(false);
@@ -85,6 +86,7 @@ export default function LoginPage() {
     }
     setIsSubmitting(true);
     setMessage(null);
+    setMagicLink(null); // Clear any previous magic link
     try {
       // Store email in cookie for future visits
       setGuestCookie({ email, allowed: true });
@@ -99,7 +101,13 @@ export default function LoginPage() {
       const data = await response.json();
       
       if (response.ok) {
-        setMessage("Check your inbox for a sign-in link from ZeroFinanx. The link will expire in 15 minutes.");
+        if (data.magicLink) {
+          // For testing - show the magic link directly
+          setMagicLink(data.magicLink);
+          setMessage(`Magic link generated! Click the link below to sign in (expires in ${data.expiresIn}):`);
+        } else {
+          setMessage("Check your inbox for a sign-in link from ZeroFinanx. The link will expire in 15 minutes.");
+        }
       } else {
         setMessage(data.error || "Couldn't send a magic link. Please try again.");
       }
@@ -198,6 +206,22 @@ export default function LoginPage() {
             {message && (
               <div className="mt-4 rounded-xl bg-slate-50 border border-slate-200 p-3 text-sm text-slate-700">
                 {message}
+                {magicLink && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-blue-800 font-medium text-xs mb-2">🧪 Testing Mode - Magic Link:</p>
+                    <a
+                      href={magicLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-2 bg-white border border-blue-300 rounded text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 break-all"
+                    >
+                      {magicLink}
+                    </a>
+                    <p className="text-xs text-blue-600 mt-2">
+                      💡 Click this link to authenticate (opens in new tab)
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -295,6 +319,22 @@ export default function LoginPage() {
           {message && (
             <div className="mt-4 rounded-xl bg-slate-50 border border-slate-200 p-3 text-sm text-slate-700">
               {message}
+              {magicLink && (
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-blue-800 font-medium text-xs mb-2">🧪 Testing Mode - Magic Link:</p>
+                  <a
+                    href={magicLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block p-2 bg-white border border-blue-300 rounded text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 break-all"
+                  >
+                    {magicLink}
+                  </a>
+                  <p className="text-xs text-blue-600 mt-2">
+                    💡 Click this link to authenticate (opens in new tab)
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
