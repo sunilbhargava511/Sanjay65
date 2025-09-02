@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Book, Calculator, Target, TrendingUp, User, LogOut, Home, FileText, Settings } from 'lucide-react';
+import { Book, Calculator, User, LogOut, Home, FileText, Settings, MessageSquare, Send, HelpCircle } from 'lucide-react';
 
 export default function Dashboard() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   useEffect(() => {
     // Check for passwordless session
@@ -61,6 +63,41 @@ export default function Dashboard() {
     router.push('/');
   };
 
+  const features = [
+    {
+      icon: Calculator,
+      title: 'Save/Spend Calculator',
+      description: 'Calculate your optimal savings rate and spending plan',
+      href: '/calculator/save-spend',
+      color: 'bg-blue-500'
+    },
+    {
+      icon: Book,
+      title: 'Educational Content',
+      description: 'Learn personal finance fundamentals',
+      href: '/learn',
+      color: 'bg-purple-500'
+    }
+  ];
+
+  const commonQuestions = [
+    "How do I calculate my Save Number?",
+    "What should I prioritize first - emergency fund or debt payoff?",
+    "How much should I save for retirement?",
+    "What's the difference between good debt and bad debt?",
+    "How do I create a budget that actually works?",
+    "Should I invest while paying off debt?"
+  ];
+
+  const handleFeedbackSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically send to an API
+    console.log('Feedback submitted:', feedbackText);
+    setFeedbackSubmitted(true);
+    setFeedbackText('');
+    setTimeout(() => setFeedbackSubmitted(false), 3000);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -71,37 +108,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const features = [
-    {
-      icon: Calculator,
-      title: 'Save/Spend Calculator',
-      description: 'Calculate your optimal savings rate and spending plan',
-      href: '/calculator/save-spend',
-      color: 'bg-blue-500'
-    },
-    {
-      icon: Target,
-      title: 'Goal Tracker',
-      description: 'Set and track your financial goals',
-      href: '/goals',
-      color: 'bg-green-500'
-    },
-    {
-      icon: Book,
-      title: 'Educational Content',
-      description: 'Learn personal finance fundamentals',
-      href: '/learn',
-      color: 'bg-purple-500'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Progress Dashboard',
-      description: 'Monitor your financial journey',
-      href: '/progress',
-      color: 'bg-orange-500'
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -138,58 +144,10 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Quick Stats */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Trial Days Left</p>
-                <p className="text-2xl font-bold text-gray-900">30</p>
-              </div>
-              <div className="rounded-lg bg-blue-100 p-3">
-                <User className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Lessons Completed</p>
-                <p className="text-2xl font-bold text-gray-900">0</p>
-              </div>
-              <div className="rounded-lg bg-green-100 p-3">
-                <Book className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Goals Set</p>
-                <p className="text-2xl font-bold text-gray-900">0</p>
-              </div>
-              <div className="rounded-lg bg-purple-100 p-3">
-                <Target className="h-6 w-6 text-purple-600" />
-              </div>
-            </div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Progress</p>
-                <p className="text-2xl font-bold text-gray-900">0%</p>
-              </div>
-              <div className="rounded-lg bg-orange-100 p-3">
-                <TrendingUp className="h-6 w-6 text-orange-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Features Grid */}
         <div className="mb-8">
           <h3 className="mb-4 text-lg font-semibold text-gray-900">Get Started</h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
@@ -212,19 +170,102 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Your Journey</h3>
+        {/* Feedback Area */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          {/* Common Questions */}
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="rounded-lg bg-blue-100 p-2">
+                <HelpCircle className="h-5 w-5 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Common Questions</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Questions others have asked - click any to get started:</p>
+            <div className="space-y-2">
+              {commonQuestions.map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => setFeedbackText(question)}
+                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition text-sm"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Feedback Form */}
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="rounded-lg bg-green-100 p-2">
+                <MessageSquare className="h-5 w-5 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Share Your Feedback</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Have questions, suggestions, or need help? Let us know!</p>
+            
+            {feedbackSubmitted ? (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                <div className="text-green-800 font-medium mb-1">Thank you!</div>
+                <div className="text-sm text-green-700">Your feedback has been submitted. We'll get back to you soon.</div>
+              </div>
+            ) : (
+              <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+                <div>
+                  <textarea
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    placeholder="Ask a question, share feedback, or tell us what you'd like to learn about..."
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 transition"
+                >
+                  <Send className="h-4 w-4" />
+                  Send Feedback
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+
+        {/* Getting Started Guide */}
+        <div className="mt-8 rounded-xl border border-gray-200 bg-white p-6">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900">Your Journey Starts Here</h3>
           <div className="space-y-4">
             <div className="flex items-center gap-4 rounded-lg bg-blue-50 p-4">
               <div className="rounded-full bg-blue-100 p-2">
-                <Home className="h-5 w-5 text-blue-600" />
+                <Calculator className="h-5 w-5 text-blue-600" />
               </div>
               <div className="flex-1">
-                <p className="font-medium text-gray-900">Welcome to ZeroFinanx!</p>
-                <p className="text-sm text-gray-600">Start with the Save/Spend Calculator to understand your numbers</p>
+                <p className="font-medium text-gray-900">Step 1: Calculate Your Numbers</p>
+                <p className="text-sm text-gray-600">Use the Save/Spend Calculator to understand your financial foundation</p>
               </div>
-              <span className="text-sm text-gray-500">Just now</span>
+              <button
+                onClick={() => router.push('/calculator/save-spend')}
+                className="text-sm font-medium text-blue-600 hover:text-blue-700"
+              >
+                Start →
+              </button>
+            </div>
+            <div className="flex items-center gap-4 rounded-lg bg-purple-50 p-4">
+              <div className="rounded-full bg-purple-100 p-2">
+                <Book className="h-5 w-5 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">Step 2: Learn the Fundamentals</p>
+                <p className="text-sm text-gray-600">Master key concepts with our bite-sized educational lessons</p>
+              </div>
+              <button
+                onClick={() => router.push('/learn')}
+                className="text-sm font-medium text-purple-600 hover:text-purple-700"
+              >
+                Learn →
+              </button>
             </div>
           </div>
         </div>
