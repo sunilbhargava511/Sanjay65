@@ -2,19 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 
-// In production, use a database to store tokens
-const magicLinkTokens = new Map<string, { email: string; expires: number }>();
-
-// Clean up expired tokens periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [token, data] of magicLinkTokens.entries()) {
-    if (data.expires < now) {
-      magicLinkTokens.delete(token);
-    }
-  }
-}, 60 * 60 * 1000); // Clean up every hour
-
 // Send magic link email
 export async function POST(request: NextRequest) {
   try {
@@ -27,12 +14,20 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Generate a secure token
-    const token = randomBytes(32).toString('hex');
-    const expires = Date.now() + 15 * 60 * 1000; // 15 minutes
+    // Generate a secure JWT token that contains the email and expiration
+    const tokenPayload = {
+      email,
+      type: 'magic-link',
+      exp: Math.floor(Date.now() / 1000) + (15 * 60), // 15 minutes from now
+      iat: Math.floor(Date.now() / 1000),
+      jti: randomBytes(16).toString('hex') // Unique token ID
+    };
     
-    // Store the token (in production, use a database)
-    magicLinkTokens.set(token, { email, expires });
+    // Sign the token with the secret
+    const token = jwt.sign(
+      tokenPayload,
+      process.env.NEXTAUTH_SECRET || 'development-secret'
+    );
     
     // Generate magic link URL with robust URL construction
     let baseUrl = 'http://localhost:3000'; // Default fallback
@@ -91,27 +86,31 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Check if token exists and is valid
-    const tokenData = magicLinkTokens.get(token);
-    
-    if (!tokenData) {
+    // Verify and decode the JWT token
+    let tokenData;
+    try {
+      tokenData = jwt.verify(
+        token,
+        process.env.NEXTAUTH_SECRET || 'development-secret'
+      ) as { email: string; type: string; exp: number; iat: number; jti: string };
+    } catch (error) {
+      console.error('Token verification failed:', error);
       return NextResponse.json(
         { error: 'Invalid or expired token' },
         { status: 401 }
       );
     }
     
-    if (tokenData.expires < Date.now()) {
-      magicLinkTokens.delete(token);
+    // Check if token is for magic link
+    if (tokenData.type !== 'magic-link') {
       return NextResponse.json(
-        { error: 'Token has expired' },
+        { error: 'Invalid token type' },
         { status: 401 }
       );
     }
     
-    // Token is valid, delete it (one-time use)
+    // Token is valid, extract email
     const { email } = tokenData;
-    magicLinkTokens.delete(token);
     
     // Create a JWT session token
     const sessionToken = jwt.sign(
