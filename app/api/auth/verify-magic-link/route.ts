@@ -63,13 +63,13 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // Redirect to the app with the session
+    // Redirect to the dashboard after successful authentication
     let redirectUrl;
     try {
-      redirectUrl = new URL('/paywall', request.url);
+      redirectUrl = new URL('/dashboard', request.url);
     } catch (error) {
       // Fallback if request.url is malformed
-      redirectUrl = new URL('/paywall', fallbackBaseUrl);
+      redirectUrl = new URL('/dashboard', fallbackBaseUrl);
     }
     const response = NextResponse.redirect(redirectUrl);
     

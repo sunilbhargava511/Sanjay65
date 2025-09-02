@@ -73,7 +73,7 @@ export default function LoginPage() {
     if (!mustAccept()) return;
     setIsSubmitting(true);
     try {
-      await signIn(provider, { callbackUrl: "/paywall" });
+      await signIn(provider, { callbackUrl: "/dashboard" });
     } catch (e) {
       setMessage("Couldn't start sign-in. Please try again.");
       setIsSubmitting(false);
