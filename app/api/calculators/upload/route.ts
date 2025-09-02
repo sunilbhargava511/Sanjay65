@@ -1,160 +1,244 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
-
-// Import the same in-memory storage (in production, this would be a database)
-declare global {
-  var uploadedCalculators: any[] | undefined;
-}
-
-const uploadedCalculators = globalThis.uploadedCalculators || [];
-if (!globalThis.uploadedCalculators) {
-  globalThis.uploadedCalculators = uploadedCalculators;
-}
+import { writeFile, mkdir } from 'fs/promises';
+import { existsSync } from 'fs';
+import path from 'path';
+import { calculators, generateId } from '../data';
+import { reactToHtmlConverter } from '@/lib/react-to-html-converter';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    
     const name = formData.get('name') as string;
     const description = formData.get('description') as string;
-    const file = formData.get('file') as File;
-    const calculatorUrl = formData.get('url') as string;
-    
+    const calculatorType = formData.get('calculatorType') as 'file' | 'url';
+    const url = formData.get('url') as string;
+    const file = formData.get('file') as File | null;
+
+    // Validate required fields
     if (!name || !description) {
       return NextResponse.json(
         { success: false, error: 'Name and description are required' },
         { status: 400 }
       );
     }
-    
-    const calculatorId = uuidv4();
-    const calculator = {
-      id: calculatorId,
-      name: name,
-      description: description,
-      type: file ? 'local' : 'url',
-      created: Date.now(),
-    };
-    
-    if (file && file.size > 0) {
-      // Handle file upload - create local calculator
-      const fileContent = await file.text();
-      
-      // Create calculator directory
-      const calculatorDir = join(process.cwd(), 'public', 'calculators', calculatorId);
-      
-      try {
-        if (!existsSync(calculatorDir)) {
-          mkdirSync(calculatorDir, { recursive: true });
-        }
-        
-        // Determine file extension and write file
-        const fileName = file.name.toLowerCase();
-        let targetFileName = 'index.html';
-        
-        if (fileName.endsWith('.tsx') || fileName.endsWith('.jsx')) {
-          // For React components, we'll wrap them in a basic HTML template
-          const wrappedContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${name}</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>
-        body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        .calculator-container { max-width: 800px; margin: 0 auto; }
-    </style>
-</head>
-<body>
-    <div id="calculator-root"></div>
-    <script type="text/babel">
-        ${fileContent}
-        
-        // Try to render the component
-        const container = document.getElementById('calculator-root');
-        const root = ReactDOM.createRoot(container);
-        
-        // Try to find and render the main component
-        try {
-            const ComponentName = Object.keys(window).find(key => 
-                key.includes('Calculator') || key.includes('Component')
-            );
-            if (ComponentName && window[ComponentName]) {
-                root.render(React.createElement(window[ComponentName]));
-            } else {
-                // Fallback: try to render default export if available
-                root.render(React.createElement('div', {}, 'Calculator loaded'));
-            }
-        } catch (error) {
-            console.error('Error rendering calculator:', error);
-            root.render(React.createElement('div', {}, 'Error loading calculator'));
-        }
-    </script>
-</body>
-</html>`;
-          writeFileSync(join(calculatorDir, targetFileName), wrappedContent);
-        } else {
-          // For HTML files, use as-is
-          writeFileSync(join(calculatorDir, targetFileName), fileContent);
-        }
-        
-        calculator.url = `/calculators/${calculatorId}`;
-        
-      } catch (fileError) {
-        console.error('Error saving calculator file:', fileError);
+
+    const calculatorId = generateId();
+    let calculatorUrl = '';
+    let fileName = '';
+
+    if (calculatorType === 'file') {
+      if (!file) {
         return NextResponse.json(
-          { success: false, error: 'Failed to save calculator file' },
-          { status: 500 }
-        );
-      }
-      
-    } else if (calculatorUrl) {
-      // Handle URL-based calculator
-      try {
-        new URL(calculatorUrl); // Validate URL
-        calculator.url = calculatorUrl;
-      } catch (urlError) {
-        return NextResponse.json(
-          { success: false, error: 'Invalid calculator URL' },
+          { success: false, error: 'File is required for file uploads' },
           { status: 400 }
         );
       }
-    } else {
-      return NextResponse.json(
-        { success: false, error: 'Either file or URL must be provided' },
-        { status: 400 }
-      );
+
+      // Validate file type
+      const allowedExtensions = ['.tsx', '.ts', '.jsx', '.js', '.html', '.htm'];
+      const fileExtension = path.extname(file.name).toLowerCase();
+      
+      if (!allowedExtensions.includes(fileExtension)) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid file type. Only .tsx, .ts, .jsx, .js, .html, .htm files are allowed' },
+          { status: 400 }
+        );
+      }
+
+      // Create calculators directory if it doesn't exist
+      const calculatorsDir = path.join(process.cwd(), 'public', 'calculators');
+      if (!existsSync(calculatorsDir)) {
+        await mkdir(calculatorsDir, { recursive: true });
+      }
+
+      // Create calculator-specific directory
+      const calculatorDir = path.join(calculatorsDir, calculatorId.toString());
+      if (!existsSync(calculatorDir)) {
+        await mkdir(calculatorDir, { recursive: true });
+      }
+
+      // Handle different file types with sophisticated processing
+      const fileContent = await file.text();
+      let processedContent = fileContent;
+      let standaloneUrl: string | null = null;
+
+      if (fileExtension === '.tsx' || fileExtension === '.jsx' || fileExtension === '.ts' || fileExtension === '.js') {
+        // Use the advanced React-to-HTML converter
+        try {
+          processedContent = await reactToHtmlConverter.convertToStandaloneHtml(
+            fileContent,
+            file.name,
+            name,
+            description
+          );
+          
+          // Also create standalone URL
+          standaloneUrl = await reactToHtmlConverter.processAndSaveCalculator(
+            fileContent,
+            file.name,
+            name,
+            description,
+            calculatorId.toString()
+          );
+          
+          console.log(`✅ Standalone calculator saved: ${standaloneUrl}`);
+        } catch (error) {
+          console.error('Advanced processing failed, falling back to basic wrapper:', error);
+          // Fallback to basic processing
+          processedContent = wrapReactComponentInHTML(fileContent, file.name, name);
+        }
+      }
+      // For .html/.htm files, use as-is
+
+      fileName = `calculator-${calculatorId}.html`;
+      const filePath = path.join(calculatorDir, fileName);
+
+      // Write file to disk
+      await writeFile(filePath, processedContent);
+
+      // Set URL for local hosting
+      calculatorUrl = `/calculators/${calculatorId}/${fileName}`;
+
+    } else if (calculatorType === 'url') {
+      if (!url) {
+        return NextResponse.json(
+          { success: false, error: 'URL is required for URL-based calculators' },
+          { status: 400 }
+        );
+      }
+
+      // Validate URL format
+      try {
+        new URL(url);
+        calculatorUrl = url;
+      } catch {
+        return NextResponse.json(
+          { success: false, error: 'Invalid URL format' },
+          { status: 400 }
+        );
+      }
     }
-    
-    // Add to calculators list (in production, save to database)
-    uploadedCalculators.push(calculator);
-    
+
+    // Get the highest order index
+    const existingCalculators = Array.from(calculators.values());
+    const orderIndex = existingCalculators.length;
+
+    // Create calculator object
+    const newCalculator = {
+      id: calculatorId,
+      name: name.trim(),
+      category: 'financial', // Default category
+      description: description.trim(),
+      url: calculatorUrl,
+      icon: 'Calculator',
+      color: 'bg-blue-500',
+      isActive: true,
+      calculatorType: calculatorType === 'file' ? 'code' as const : 'url' as const,
+      fileName: fileName || undefined,
+      orderIndex,
+      isPublished: true,
+      fields: []
+    };
+
+    // Save to data store
+    calculators.set(calculatorId, newCalculator);
+
     return NextResponse.json({
       success: true,
-      calculator,
-      message: 'Calculator uploaded successfully'
+      calculator: {
+        ...newCalculator,
+        standaloneUrl
+      },
+      message: 'Calculator uploaded successfully',
+      standaloneUrl
     });
-    
+
   } catch (error) {
     console.error('Calculator upload error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Upload failed' 
-      },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
 
+// Fallback function for basic React component wrapping
+function wrapReactComponentInHTML(reactCode: string, fileName: string, name: string): string {
+  const componentName = fileName.replace(/\.(tsx|ts|jsx|js)$/, '').replace(/[^a-zA-Z0-9]/g, '');
+  
+  const cleanedCode = reactCode
+    .replace(/^import\s+.*?from\s+['"][^'"]*['"];?\s*$/gm, '') // Remove import statements
+    .replace(/^export\s+default\s+/gm, 'window.Calculator = ') // Convert default export
+    .replace(/^export\s+/gm, 'window.') // Convert named exports
+    .replace(/export\s*{\s*([^}]+)\s*}/g, (match, exports) => {
+      return exports.split(',').map((exp: string) => {
+        const [name, alias] = exp.split(' as ').map((s: string) => s.trim());
+        const targetName = alias || name;
+        return `window.${targetName} = ${name};`;
+      }).join('\n');
+    });
+  
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${name}</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        #root {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script>
+        window.exports = {};
+        window.module = { exports: window.exports };
+    </script>
+    
+    <script type="text/babel" data-presets="react,env">
+        ${cleanedCode}
+        
+        const componentNames = ['Calculator', '${componentName}', 'App', 'default'];
+        let ComponentToRender = null;
+        
+        for (const name of componentNames) {
+            if (typeof window[name] !== 'undefined') {
+                ComponentToRender = window[name];
+                break;
+            }
+        }
+        
+        if (ComponentToRender) {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(React.createElement(ComponentToRender));
+        } else {
+            document.getElementById('root').innerHTML = '<div><h1>Calculator Loaded</h1><p>Component could not be automatically rendered.</p></div>';
+        }
+    </script>
+</body>
+</html>`;
+}
+
 export async function GET() {
   // Return list of uploaded calculators
+  const uploadedCalculators = Array.from(calculators.values());
   return NextResponse.json({
     success: true,
     calculators: uploadedCalculators

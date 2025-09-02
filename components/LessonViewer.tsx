@@ -71,7 +71,7 @@ export default function LessonViewer({ lessonId, onClose, onBack }: LessonViewer
     );
   }
 
-  const embedUrl = lessonService.getYouTubeEmbedUrl(lesson.youtubeUrl);
+  const embedUrl = lesson.videoUrl ? lessonService.getYouTubeEmbedUrl(lessonService.extractYouTubeVideoId(lesson.videoUrl) || '') : null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-2 sm:p-4">
@@ -158,17 +158,52 @@ export default function LessonViewer({ lessonId, onClose, onBack }: LessonViewer
                 <div className="text-center text-white">
                   <div className="text-red-400 mb-2">⚠️</div>
                   <p>Unable to load video</p>
-                  <a 
-                    href={lesson.youtubeUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-block text-blue-400 hover:text-blue-300 underline"
-                  >
-                    Watch on YouTube
-                  </a>
+                  {lesson.videoUrl && (
+                    <a 
+                      href={lesson.videoUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-block text-blue-400 hover:text-blue-300 underline"
+                    >
+                      Watch on YouTube
+                    </a>
+                  )}
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Start Message */}
+          {lesson.startMessage && (
+            <div className="p-4 sm:p-6 bg-blue-50 border-b border-blue-200">
+              <div className="prose prose-sm sm:prose-base max-w-none">
+                <p className="text-blue-800 leading-relaxed font-medium">
+                  {lesson.startMessage}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Video Summary - displayed below video */}
+          {lesson.videoSummary && (
+            <div className="p-4 sm:p-6 bg-gray-50 border-b border-gray-200">
+              <h3 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">About this Video</h3>
+              <div className="prose prose-sm sm:prose-base max-w-none">
+                <p className="text-gray-700 leading-relaxed">
+                  {lesson.videoSummary}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Lesson Content */}
+          <div className="p-4 sm:p-6">
+            <div className="prose prose-sm sm:prose-base max-w-none">
+              <div 
+                className="text-gray-800 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: lesson.content.replace(/\n/g, '<br>') }}
+              />
+            </div>
           </div>
 
           {/* Educational Disclaimer - Mobile Optimized */}

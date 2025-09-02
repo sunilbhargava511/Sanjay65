@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Edit3, Trash2, Calculator, Eye } from 'lucide-react';
+import CalculatorUpload from '@/components/CalculatorUpload';
 
 export const dynamic = 'force-dynamic';
 
@@ -202,6 +203,14 @@ export default function CalculatorsManagement() {
             </button>
           </div>
         </div>
+
+        {/* Calculator Upload Section */}
+        <CalculatorUpload 
+          onUploadSuccess={(calculator) => {
+            setCalculators(prev => [...prev, calculator]);
+          }}
+          className="mb-6"
+        />
 
         {/* Calculators List */}
         {isLoading ? (

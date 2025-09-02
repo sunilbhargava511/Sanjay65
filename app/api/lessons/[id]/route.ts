@@ -51,8 +51,13 @@ export async function PUT(
       difficulty,
       description,
       content,
+      videoUrl,
+      videoSummary,
+      startMessage,
+      orderIndex,
       icon,
-      color
+      color,
+      active
     } = body;
 
     // Update lesson with new data
@@ -64,8 +69,13 @@ export async function PUT(
       difficulty: difficulty || lesson.difficulty,
       description: description?.trim() || lesson.description,
       content: content?.trim() || lesson.content,
+      videoUrl: videoUrl !== undefined ? videoUrl?.trim() : lesson.videoUrl,
+      videoSummary: videoSummary !== undefined ? videoSummary?.trim() : lesson.videoSummary,
+      startMessage: startMessage !== undefined ? startMessage?.trim() : lesson.startMessage,
+      orderIndex: orderIndex !== undefined ? orderIndex : lesson.orderIndex,
       icon: icon || lesson.icon,
-      color: color || lesson.color
+      color: color || lesson.color,
+      active: active !== undefined ? active : lesson.active
     };
 
     lessons.set(id, updatedLesson);

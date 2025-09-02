@@ -13,6 +13,7 @@ export interface CalculatorTool {
   calculatorType: 'url' | 'code'; // Type of calculator
   code?: string; // JavaScript/TypeScript code for the calculator logic
   fileName?: string; // For tracking uploaded files
+  artifactUrl?: string; // For Claude artifact URLs
   orderIndex: number; // For ordering calculators
   isPublished: boolean; // Draft/published state
   fields: Array<{

@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       calculatorType = 'code',
       code,
       fileName,
+      artifactUrl,
       orderIndex,
       isPublished = true,
       fields = []
@@ -93,6 +94,7 @@ export async function POST(request: NextRequest) {
       calculatorType,
       code: code || undefined,
       fileName,
+      artifactUrl,
       orderIndex: finalOrderIndex,
       isPublished,
       fields: Array.isArray(fields) ? fields : []

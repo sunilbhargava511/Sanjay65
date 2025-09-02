@@ -20,13 +20,20 @@ export default function CalculatorUpload({ onUploadSuccess, className = '' }: Ca
     const selectedFile = event.target.files?.[0];
     setFile(selectedFile || null);
     setError(null);
+    
+    // Clear existing data when file changes
+    setName('');
+    setDescription('');
   };
 
   const handleUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCalculatorUrl(event.target.value);
     setError(null);
+    
+    // Clear existing data when URL changes
+    setName('');
+    setDescription('');
   };
-
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -38,6 +45,7 @@ export default function CalculatorUpload({ onUploadSuccess, className = '' }: Ca
       const formData = new FormData();
       formData.append('name', name);
       formData.append('description', description);
+      formData.append('calculatorType', uploadMode);
 
       if (uploadMode === 'file') {
         if (!file) {

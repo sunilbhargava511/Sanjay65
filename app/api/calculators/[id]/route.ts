@@ -55,6 +55,7 @@ export async function PUT(
       calculatorType,
       code,
       fileName,
+      artifactUrl,
       orderIndex,
       isPublished,
       fields
@@ -73,6 +74,7 @@ export async function PUT(
       calculatorType: calculatorType || calculator.calculatorType,
       code: code !== undefined ? code : calculator.code,
       fileName: fileName !== undefined ? fileName : calculator.fileName,
+      artifactUrl: artifactUrl !== undefined ? artifactUrl : calculator.artifactUrl,
       orderIndex: orderIndex !== undefined ? orderIndex : calculator.orderIndex,
       isPublished: isPublished !== undefined ? isPublished : calculator.isPublished,
       fields: Array.isArray(fields) ? fields : calculator.fields

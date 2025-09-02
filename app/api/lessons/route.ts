@@ -36,8 +36,13 @@ export async function POST(request: NextRequest) {
       difficulty = 'Beginner',
       description,
       content,
+      videoUrl,
+      videoSummary,
+      startMessage,
+      orderIndex,
       icon = 'BookOpen',
-      color = 'bg-blue-500'
+      color = 'bg-blue-500',
+      active = true
     } = body;
 
     // Validate required fields
@@ -50,6 +55,13 @@ export async function POST(request: NextRequest) {
 
     const lessonId = generateId();
     
+    // Get the highest order index if not provided
+    let finalOrderIndex = orderIndex;
+    if (finalOrderIndex === undefined) {
+      const existingLessons = Array.from(lessons.values());
+      finalOrderIndex = existingLessons.length;
+    }
+    
     const newLesson: Lesson = {
       id: lessonId,
       title: title.trim(),
@@ -58,8 +70,13 @@ export async function POST(request: NextRequest) {
       difficulty,
       description: description.trim(),
       content: content.trim(),
+      videoUrl: videoUrl?.trim(),
+      videoSummary: videoSummary?.trim(),
+      startMessage: startMessage?.trim(),
+      orderIndex: finalOrderIndex,
       icon,
       color,
+      active,
       completed: false
     };
 
