@@ -120,13 +120,29 @@ export async function GET(request: NextRequest) {
       { expiresIn: '30d' }
     );
     
+    // Generate fallback base URL for redirect
+    let fallbackBaseUrl = 'https://zerofinanx-website.vercel.app'; // Production fallback
+    
+    // Try to get base URL from environment
+    if (process.env.NEXTAUTH_URL) {
+      fallbackBaseUrl = process.env.NEXTAUTH_URL.trim();
+      // Clean any duplicate protocols
+      if (fallbackBaseUrl.startsWith('https://https://') || fallbackBaseUrl.startsWith('http://https://')) {
+        fallbackBaseUrl = fallbackBaseUrl.replace(/^https?:\/\//, '');
+      }
+      // Ensure it starts with protocol
+      if (!fallbackBaseUrl.startsWith('http://') && !fallbackBaseUrl.startsWith('https://')) {
+        fallbackBaseUrl = `https://${fallbackBaseUrl}`;
+      }
+    }
+    
     // Redirect to the app with the session
     let redirectUrl;
     try {
       redirectUrl = new URL('/paywall', request.url);
     } catch (error) {
       // Fallback if request.url is malformed
-      redirectUrl = new URL('/paywall', baseUrl);
+      redirectUrl = new URL('/paywall', fallbackBaseUrl);
     }
     const response = NextResponse.redirect(redirectUrl);
     
