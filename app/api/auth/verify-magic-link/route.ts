@@ -67,17 +67,20 @@ export async function GET(request: NextRequest) {
     let redirectUrl;
     try {
       redirectUrl = new URL('/dashboard', request.url);
+      redirectUrl.searchParams.set('from', 'magic-link');
     } catch (error) {
       // Fallback if request.url is malformed
       redirectUrl = new URL('/dashboard', fallbackBaseUrl);
+      redirectUrl.searchParams.set('from', 'magic-link');
     }
     const response = NextResponse.redirect(redirectUrl);
     
-    // Set session cookie
+    // Set session cookie with proper domain and path
     response.cookies.set('passwordless-session', sessionToken, {
-      httpOnly: true,
+      httpOnly: false, // Allow client-side access for now to debug
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
+      path: '/',
       maxAge: 30 * 24 * 60 * 60 // 30 days
     });
     

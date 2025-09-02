@@ -13,19 +13,36 @@ export default function Dashboard() {
     // Check for passwordless session
     const checkSession = async () => {
       try {
+        console.log('All cookies:', document.cookie);
+        
         // Check for passwordless session cookie
         const sessionCookie = document.cookie
           .split('; ')
           .find(row => row.startsWith('passwordless-session='));
         
+        console.log('Session cookie found:', sessionCookie ? 'Yes' : 'No');
+        
         if (sessionCookie) {
           // Decode JWT to get email (in production, validate on server)
           const token = sessionCookie.split('=')[1];
           const payload = JSON.parse(atob(token.split('.')[1]));
+          console.log('Session payload:', payload);
           setUserEmail(payload.email);
         } else {
-          // No session, redirect to login
-          router.push('/login');
+          // Check URL params for immediate redirect from magic link
+          const urlParams = new URLSearchParams(window.location.search);
+          const fromMagicLink = urlParams.get('from') === 'magic-link';
+          
+          if (fromMagicLink) {
+            // Give cookie time to be set
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          } else {
+            // No session, redirect to login
+            console.log('No session found, redirecting to login');
+            router.push('/login');
+          }
         }
       } catch (error) {
         console.error('Session check failed:', error);
