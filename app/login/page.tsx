@@ -6,6 +6,9 @@ import AfterLoginDashboard from '@/components/AfterLoginDashboard';
 import EmailGate from '@/components/EmailGate';
 import { getStoredEmail, setGuestCookie } from '@/lib/guest-cookie';
 
+// Force this page to be dynamic - it needs to read environment variables
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage() {
   const { data: session, status } = useSession();
   const [email, setEmail] = useState("");
