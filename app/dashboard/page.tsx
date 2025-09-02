@@ -80,13 +80,13 @@ export default function Dashboard() {
     }
   ];
 
-  const commonQuestions = [
-    "How do I calculate my Save Number?",
-    "What should I prioritize first - emergency fund or debt payoff?",
-    "How much should I save for retirement?",
-    "What's the difference between good debt and bad debt?",
-    "How do I create a budget that actually works?",
-    "Should I invest while paying off debt?"
+  const suggestedTopics = [
+    "Save & Spend Numbers",
+    "Emergency Fund Planning",
+    "Debt Management Strategies",
+    "Retirement Savings",
+    "Budgeting Basics",
+    "Investment vs Debt Payoff"
   ];
 
   const handleFeedbackSubmit = (e: React.FormEvent) => {
@@ -172,25 +172,33 @@ export default function Dashboard() {
 
         {/* Feedback Area */}
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Common Questions */}
+          {/* Suggested Topics */}
           <div className="rounded-xl border border-gray-200 bg-white p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="rounded-lg bg-blue-100 p-2">
                 <HelpCircle className="h-5 w-5 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Common Questions</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Explore Topics</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Questions others have asked - click any to get started:</p>
+            <p className="text-sm text-gray-600 mb-4">Select a topic you'd like to learn about, then ask your question:</p>
             <div className="space-y-2">
-              {commonQuestions.map((question, index) => (
+              {suggestedTopics.map((topic, index) => (
                 <button
                   key={index}
-                  onClick={() => setFeedbackText(question)}
-                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition text-sm"
+                  onClick={() => setFeedbackText(`I have a question about ${topic}: `)}
+                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition text-sm font-medium"
                 >
-                  {question}
+                  <div className="flex items-center justify-between">
+                    <span>{topic}</span>
+                    <span className="text-gray-400">→</span>
+                  </div>
                 </button>
               ))}
+            </div>
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-600">
+                💡 <strong>Tip:</strong> Click a topic above, then type your specific question in the feedback box.
+              </p>
             </div>
           </div>
 
