@@ -34,12 +34,25 @@ export async function POST(request: NextRequest) {
     // Store the token (in production, use a database)
     magicLinkTokens.set(token, { email, expires });
     
-    // Generate magic link URL
-    let baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    // Generate magic link URL with robust URL construction
+    let baseUrl = 'http://localhost:3000'; // Default fallback
     
-    // If NEXTAUTH_URL is not set but VERCEL_URL is available, use it with https
-    if (!process.env.NEXTAUTH_URL && process.env.VERCEL_URL) {
-      baseUrl = `https://${process.env.VERCEL_URL}`;
+    // First try NEXTAUTH_URL, clean it if it exists
+    if (process.env.NEXTAUTH_URL) {
+      baseUrl = process.env.NEXTAUTH_URL.trim();
+      // Ensure it doesn't have duplicate protocols
+      if (baseUrl.startsWith('https://https://') || baseUrl.startsWith('http://https://')) {
+        baseUrl = baseUrl.replace(/^https?:\/\//, '');
+      }
+      // Ensure it starts with protocol
+      if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+        baseUrl = `https://${baseUrl}`;
+      }
+    } 
+    // Fallback to VERCEL_URL if available
+    else if (process.env.VERCEL_URL) {
+      const vercelUrl = process.env.VERCEL_URL.trim();
+      baseUrl = vercelUrl.startsWith('http') ? vercelUrl : `https://${vercelUrl}`;
     }
     
     const magicLink = `${baseUrl}/api/auth/verify-magic-link?token=${token}`;
@@ -108,7 +121,14 @@ export async function GET(request: NextRequest) {
     );
     
     // Redirect to the app with the session
-    const response = NextResponse.redirect(new URL('/paywall', request.url));
+    let redirectUrl;
+    try {
+      redirectUrl = new URL('/paywall', request.url);
+    } catch (error) {
+      // Fallback if request.url is malformed
+      redirectUrl = new URL('/paywall', baseUrl);
+    }
+    const response = NextResponse.redirect(redirectUrl);
     
     // Set session cookie
     response.cookies.set('passwordless-session', sessionToken, {
