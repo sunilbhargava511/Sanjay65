@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Interest Calculator</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .calculator-container { max-width: 800px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div id="calculator-root"></div>
+    <script type="text/babel">
+        const { useState } = React;
+
+function TestCalculator() {
+  const [principal, setPrincipal] = useState(1000);
+  const [rate, setRate] = useState(5);
+  const [time, setTime] = useState(1);
+  const [result, setResult] = useState(0);
+
+  const calculateInterest = () => {
+    const interest = (principal * rate * time) / 100;
+    setResult(interest);
+  };
+
+  return (
+    React.createElement('div', { className: 'calculator-container' },
+      React.createElement('h2', null, 'Simple Interest Calculator'),
+      React.createElement('div', { style: { marginBottom: '10px' } },
+        React.createElement('label', null, 'Principal Amount: $'),
+        React.createElement('input', {
+          type: 'number',
+          value: principal,
+          onChange: (e) => setPrincipal(Number(e.target.value)),
+          style: { marginLeft: '10px', padding: '5px' }
+        })
+      ),
+      React.createElement('div', { style: { marginBottom: '10px' } },
+        React.createElement('label', null, 'Interest Rate (%): '),
+        React.createElement('input', {
+          type: 'number',
+          value: rate,
+          onChange: (e) => setRate(Number(e.target.value)),
+          style: { marginLeft: '10px', padding: '5px' }
+        })
+      ),
+      React.createElement('div', { style: { marginBottom: '10px' } },
+        React.createElement('label', null, 'Time (years): '),
+        React.createElement('input', {
+          type: 'number',
+          value: time,
+          onChange: (e) => setTime(Number(e.target.value)),
+          style: { marginLeft: '10px', padding: '5px' }
+        })
+      ),
+      React.createElement('button', {
+        onClick: calculateInterest,
+        style: { 
+          padding: '10px 20px', 
+          backgroundColor: '#007bff', 
+          color: 'white', 
+          border: 'none', 
+          borderRadius: '5px',
+          cursor: 'pointer',
+          marginTop: '10px'
+        }
+      }, 'Calculate Interest'),
+      React.createElement('div', { 
+        style: { 
+          marginTop: '20px', 
+          padding: '10px', 
+          backgroundColor: '#f8f9fa',
+          borderRadius: '5px'
+        }
+      }, `Interest: $${result.toFixed(2)}`)
+    )
+  );
+}
+
+// Make the component available globally
+window.TestCalculator = TestCalculator;
+        
+        // Try to render the component
+        const container = document.getElementById('calculator-root');
+        const root = ReactDOM.createRoot(container);
+        
+        // Try to find and render the main component
+        try {
+            const ComponentName = Object.keys(window).find(key => 
+                key.includes('Calculator') || key.includes('Component')
+            );
+            if (ComponentName && window[ComponentName]) {
+                root.render(React.createElement(window[ComponentName]));
+            } else {
+                // Fallback: try to render default export if available
+                root.render(React.createElement('div', {}, 'Calculator loaded'));
+            }
+        } catch (error) {
+            console.error('Error rendering calculator:', error);
+            root.render(React.createElement('div', {}, 'Error loading calculator'));
+        }
+    </script>
+</body>
+</html>
