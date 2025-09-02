@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 // Pricing-only homepage for zerofinanx.com (USA)
 // Notes for developer:
@@ -132,9 +133,32 @@ function RoadmapCard({ name, priceLabel, blurb, badge = "Roadmap", footnote, cta
 }
 
 export default function ZeroFinanxPricingPage() {
+  const router = useRouter();
   const [showBio, setShowBio] = useState(false);
   const [showPhilosophy, setShowPhilosophy] = useState(false);
   const [showBetaTerms, setShowBetaTerms] = useState(false);
+
+  // Check for existing session on page load
+  useEffect(() => {
+    const checkSession = () => {
+      try {
+        // Check for passwordless session cookie
+        const sessionCookie = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('passwordless-session='));
+        
+        if (sessionCookie) {
+          // User is already authenticated, redirect to dashboard
+          router.push('/dashboard');
+        }
+      } catch (error) {
+        // If there's any error, just continue showing the home page
+        console.error('Session check failed:', error);
+      }
+    };
+
+    checkSession();
+  }, [router]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header (no left-top block) */}
