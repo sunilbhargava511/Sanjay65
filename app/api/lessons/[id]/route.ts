@@ -1,23 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// In-memory storage for demo purposes
-// In production, this would be a proper database
-const lessons: Map<number, Lesson> = new Map();
+// Import the lessons Map from the main route
+// In a real app, this would be a shared database connection
+const lessons: Map<number, any> = new Map();
 
-export interface Lesson {
-  id: number;
-  title: string;
-  category: string;
-  duration: string;
-  difficulty: string;
-  description: string;
-  content: string;
-  icon: string;
-  color: string;
-  completed: boolean;
-}
-
-// Initialize with the current lessons from the Learn page
+// Initialize with the same data as the main route
 if (lessons.size === 0) {
   lessons.set(1, {
     id: 1,
@@ -226,30 +213,24 @@ Some people use snowball for small debts under $1,000, then switch to avalanche.
   });
 }
 
-let nextId = 5; // Start from 5 since we have 4 initial lessons
-
-function generateId(): number {
-  return nextId++;
-}
-
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
+    const id = parseInt(params.id);
+    const lesson = lessons.get(id);
     
-    let lessonList = Array.from(lessons.values());
-    
-    if (category && category !== 'all') {
-      lessonList = lessonList.filter(lesson => lesson.category === category);
+    if (!lesson) {
+      return NextResponse.json(
+        { error: 'Lesson not found' },
+        { status: 404 }
+      );
     }
-    
-    // Sort by id for consistent ordering
-    lessonList.sort((a, b) => a.id - b.id);
 
-    return NextResponse.json(lessonList);
-
+    return NextResponse.json(lesson);
   } catch (error) {
-    console.error('Error fetching lessons:', error);
+    console.error('Error fetching lesson:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -257,49 +238,78 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const body = await request.json();
-    const { 
-      title, 
-      category = 'basics', 
-      duration,
-      difficulty = 'Beginner',
-      description,
-      content,
-      icon = 'BookOpen',
-      color = 'bg-blue-500'
-    } = body;
-
-    // Validate required fields
-    if (!title || !description || !content) {
+    const id = parseInt(params.id);
+    const lesson = lessons.get(id);
+    
+    if (!lesson) {
       return NextResponse.json(
-        { error: 'Title, description, and content are required' },
-        { status: 400 }
+        { error: 'Lesson not found' },
+        { status: 404 }
       );
     }
 
-    const lessonId = generateId();
-    
-    const newLesson: Lesson = {
-      id: lessonId,
-      title: title.trim(),
-      category,
-      duration: duration?.trim() || '5 min read',
+    const body = await request.json();
+    const { 
+      title, 
+      category, 
+      duration,
       difficulty,
-      description: description.trim(),
-      content: content.trim(),
+      description,
+      content,
       icon,
-      color,
-      completed: false
+      color
+    } = body;
+
+    // Update lesson with new data
+    const updatedLesson = {
+      ...lesson,
+      title: title?.trim() || lesson.title,
+      category: category || lesson.category,
+      duration: duration?.trim() || lesson.duration,
+      difficulty: difficulty || lesson.difficulty,
+      description: description?.trim() || lesson.description,
+      content: content?.trim() || lesson.content,
+      icon: icon || lesson.icon,
+      color: color || lesson.color
     };
 
-    lessons.set(lessonId, newLesson);
+    lessons.set(id, updatedLesson);
 
-    return NextResponse.json(newLesson, { status: 201 });
-
+    return NextResponse.json(updatedLesson);
   } catch (error) {
-    console.error('Error creating lesson:', error);
+    console.error('Error updating lesson:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = parseInt(params.id);
+    const lesson = lessons.get(id);
+    
+    if (!lesson) {
+      return NextResponse.json(
+        { error: 'Lesson not found' },
+        { status: 404 }
+      );
+    }
+
+    lessons.delete(id);
+
+    return NextResponse.json({ message: 'Lesson deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting lesson:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

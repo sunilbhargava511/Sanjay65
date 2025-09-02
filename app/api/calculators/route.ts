@@ -2,82 +2,142 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // In-memory storage for demo purposes
 // In production, this would be a proper database
-const calculators: Map<string, Calculator> = new Map();
+const calculators: Map<number, CalculatorTool> = new Map();
 
-export interface Calculator {
-  id: string;
+export interface CalculatorTool {
+  id: number;
   name: string;
+  category: string;
   description: string;
-  url?: string;
-  calculatorType: 'url' | 'code';
-  codeContent?: string;
-  fileName?: string;
-  orderIndex: number;
-  active: boolean;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
+  url: string;
+  icon: string;
+  color: string;
+  isActive: boolean;
+  fields: Array<{
+    name: string;
+    label: string;
+    type: string;
+    placeholder?: string;
+    required: boolean;
+  }>;
 }
 
 // Initialize with demo calculators
 if (calculators.size === 0) {
-  const now = new Date().toISOString();
-  
-  calculators.set('save-calculator', {
-    id: 'save-calculator',
-    name: 'Save/Spend Number Calculator',
-    description: 'Calculate your monthly savings target for retirement goals',
-    calculatorType: 'code',
-    fileName: 'save-calculator.html',
-    orderIndex: 0,
-    active: true,
-    isPublished: true,
-    createdAt: now,
-    updatedAt: now
+  calculators.set(1, {
+    id: 1,
+    name: 'Save/Spend Calculator',
+    description: 'Calculate your optimal savings rate and spending plan based on your income and expenses.',
+    url: '/calculator/save-spend',
+    category: 'financial',
+    icon: 'Calculator',
+    color: 'bg-blue-500',
+    isActive: true,
+    fields: [
+      {
+        name: 'monthly_income',
+        label: 'Monthly After-Tax Income',
+        type: 'number',
+        placeholder: '5000',
+        required: true
+      },
+      {
+        name: 'housing',
+        label: 'Housing (Rent/Mortgage)',
+        type: 'number',
+        placeholder: '1500',
+        required: true
+      },
+      {
+        name: 'food',
+        label: 'Food & Groceries',
+        type: 'number',
+        placeholder: '600',
+        required: true
+      },
+      {
+        name: 'transportation',
+        label: 'Transportation',
+        type: 'number',
+        placeholder: '400',
+        required: true
+      },
+      {
+        name: 'utilities',
+        label: 'Utilities',
+        type: 'number',
+        placeholder: '200',
+        required: true
+      },
+      {
+        name: 'insurance',
+        label: 'Insurance',
+        type: 'number',
+        placeholder: '300',
+        required: true
+      }
+    ]
   });
-  
-  calculators.set('emergency-fund', {
-    id: 'emergency-fund',
+
+  calculators.set(2, {
+    id: 2,
     name: 'Emergency Fund Calculator',
-    description: 'Determine the right emergency fund size for your situation',
-    calculatorType: 'code',
-    fileName: 'emergency-fund.html',
-    orderIndex: 1,
-    active: true,
-    isPublished: true,
-    createdAt: now,
-    updatedAt: now
+    description: 'Determine how much you need in your emergency fund based on your expenses.',
+    url: '/calculator/emergency-fund',
+    category: 'savings',
+    icon: 'Shield',
+    color: 'bg-green-500',
+    isActive: false,
+    fields: [
+      {
+        name: 'monthly_expenses',
+        label: 'Monthly Essential Expenses',
+        type: 'number',
+        placeholder: '3000',
+        required: true
+      },
+      {
+        name: 'months_coverage',
+        label: 'Months of Coverage',
+        type: 'number',
+        placeholder: '6',
+        required: true
+      }
+    ]
   });
 }
 
-function generateId(): string {
-  return 'calc_' + Date.now().toString(36) + Math.random().toString(36).substr(2);
+let nextId = 3; // Start from 3 since we have 2 initial calculators
+
+function generateId(): number {
+  return nextId++;
 }
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const activeOnly = searchParams.get('activeOnly') === 'true';
+    const category = searchParams.get('category');
 
     let calculatorList = Array.from(calculators.values());
     
     if (activeOnly) {
-      calculatorList = calculatorList.filter(calc => calc.active && calc.isPublished);
+      calculatorList = calculatorList.filter(calc => calc.isActive);
     }
     
-    // Sort by orderIndex
-    calculatorList.sort((a, b) => a.orderIndex - b.orderIndex);
+    if (category && category !== 'all') {
+      calculatorList = calculatorList.filter(calc => calc.category === category);
+    }
+    
+    // Sort by id for consistent ordering
+    calculatorList.sort((a, b) => a.id - b.id);
 
-    return NextResponse.json({
-      success: true,
-      calculators: calculatorList,
-      count: calculatorList.length
-    });
+    return NextResponse.json(calculatorList);
 
   } catch (error) {
     console.error('Error fetching calculators:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -89,73 +149,44 @@ export async function POST(request: NextRequest) {
     const { 
       name, 
       description, 
-      url, 
-      calculatorType = 'url', 
-      codeContent, 
-      fileName, 
-      orderIndex,
-      isPublished = true 
+      url,
+      category = 'financial',
+      icon = 'Calculator',
+      color = 'bg-blue-500',
+      isActive = true,
+      fields = []
     } = body;
 
     // Validate required fields
     if (!name || !description) {
       return NextResponse.json(
-        { success: false, error: 'Name and description are required' },
-        { status: 400 }
-      );
-    }
-
-    // Validate based on calculator type
-    if (calculatorType === 'url' && !url) {
-      return NextResponse.json(
-        { success: false, error: 'URL is required for URL-based calculators' },
-        { status: 400 }
-      );
-    }
-
-    if (calculatorType === 'code' && !codeContent) {
-      return NextResponse.json(
-        { success: false, error: 'Code content is required for code-based calculators' },
+        { error: 'Name and description are required' },
         { status: 400 }
       );
     }
 
     const calculatorId = generateId();
-    const now = new Date().toISOString();
     
-    // Get the highest order index if not provided
-    let finalOrderIndex = orderIndex;
-    if (finalOrderIndex === undefined) {
-      const existingCalculators = Array.from(calculators.values());
-      finalOrderIndex = existingCalculators.length;
-    }
-
-    const newCalculator: Calculator = {
+    const newCalculator: CalculatorTool = {
       id: calculatorId,
       name: name.trim(),
       description: description.trim(),
-      url: url?.trim() || undefined,
-      calculatorType,
-      codeContent: codeContent?.trim() || undefined,
-      fileName: fileName?.trim() || undefined,
-      orderIndex: finalOrderIndex,
-      active: true,
-      isPublished,
-      createdAt: now,
-      updatedAt: now
+      url: url?.trim() || '',
+      category,
+      icon,
+      color,
+      isActive,
+      fields: Array.isArray(fields) ? fields : []
     };
 
     calculators.set(calculatorId, newCalculator);
 
-    return NextResponse.json({
-      success: true,
-      calculator: newCalculator
-    }, { status: 201 });
+    return NextResponse.json(newCalculator, { status: 201 });
 
   } catch (error) {
     console.error('Error creating calculator:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
