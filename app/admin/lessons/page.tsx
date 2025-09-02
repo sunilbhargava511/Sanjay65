@@ -14,9 +14,14 @@ interface Lesson {
   difficulty: string;
   description: string;
   content: string;
+  videoUrl?: string;
+  videoSummary?: string;
+  startMessage?: string;
+  orderIndex: number;
   icon: string;
   color: string;
   completed: boolean;
+  active: boolean;
 }
 
 export default function LessonsManagement() {
@@ -31,8 +36,12 @@ export default function LessonsManagement() {
     difficulty: 'Beginner',
     description: '',
     content: '',
+    videoUrl: '',
+    videoSummary: '',
+    startMessage: '',
     icon: 'PiggyBank',
-    color: 'bg-green-500'
+    color: 'bg-green-500',
+    active: true
   });
 
   // Load lessons on component mount
@@ -109,8 +118,12 @@ export default function LessonsManagement() {
       difficulty: lesson.difficulty,
       description: lesson.description,
       content: lesson.content,
+      videoUrl: lesson.videoUrl || '',
+      videoSummary: lesson.videoSummary || '',
+      startMessage: lesson.startMessage || '',
       icon: lesson.icon,
-      color: lesson.color
+      color: lesson.color,
+      active: lesson.active
     });
     setShowAddModal(true);
   };
@@ -125,8 +138,12 @@ export default function LessonsManagement() {
       difficulty: 'Beginner',
       description: '',
       content: '',
+      videoUrl: '',
+      videoSummary: '',
+      startMessage: '',
       icon: 'PiggyBank',
-      color: 'bg-green-500'
+      color: 'bg-green-500',
+      active: true
     });
   };
 
@@ -341,6 +358,45 @@ export default function LessonsManagement() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                    YouTube Video URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.videoUrl}
+                    onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                    placeholder="https://youtube.com/watch?v=..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Start Message (Text Intro)
+                  </label>
+                  <textarea
+                    value={formData.startMessage}
+                    onChange={(e) => setFormData({ ...formData, startMessage: e.target.value })}
+                    rows={3}
+                    placeholder="Welcome message shown before the lesson content..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Video Summary (Content below video)
+                  </label>
+                  <textarea
+                    value={formData.videoSummary}
+                    onChange={(e) => setFormData({ ...formData, videoSummary: e.target.value })}
+                    rows={4}
+                    placeholder="Summary or follow-up content to display below the video..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Content (Markdown supported)
                   </label>
                   <textarea
@@ -350,6 +406,19 @@ export default function LessonsManagement() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-mono text-sm"
                     required
                   />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="active"
+                    checked={formData.active}
+                    onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+                    className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                  />
+                  <label htmlFor="active" className="text-sm text-gray-700">
+                    Active (visible to users)
+                  </label>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">

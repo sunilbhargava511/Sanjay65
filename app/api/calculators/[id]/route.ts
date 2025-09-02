@@ -52,6 +52,11 @@ export async function PUT(
       icon,
       color,
       isActive,
+      calculatorType,
+      code,
+      fileName,
+      orderIndex,
+      isPublished,
       fields
     } = body;
 
@@ -65,6 +70,11 @@ export async function PUT(
       icon: icon || calculator.icon,
       color: color || calculator.color,
       isActive: isActive !== undefined ? isActive : calculator.isActive,
+      calculatorType: calculatorType || calculator.calculatorType,
+      code: code !== undefined ? code : calculator.code,
+      fileName: fileName !== undefined ? fileName : calculator.fileName,
+      orderIndex: orderIndex !== undefined ? orderIndex : calculator.orderIndex,
+      isPublished: isPublished !== undefined ? isPublished : calculator.isPublished,
       fields: Array.isArray(fields) ? fields : calculator.fields
     };
 

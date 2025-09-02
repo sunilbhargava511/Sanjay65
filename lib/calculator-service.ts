@@ -1,162 +1,135 @@
-// Calculator service for ZeroFinanx
-// Adapted from the financial-advisor calculator system
-
-export interface Calculator {
-  id: string;
-  name: string;
-  description: string;
-  url?: string;
-  calculatorType: 'url' | 'code';
-  codeContent?: string;
-  fileName?: string;
-  orderIndex: number;
-  active: boolean;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { CalculatorTool, calculators, generateId } from '@/app/api/calculators/data';
 
 export class CalculatorService {
   
-  // Get all calculators
-  async getAllCalculators(activeOnly: boolean = false): Promise<Calculator[]> {
-    try {
-      const url = `/api/calculators${activeOnly ? '?activeOnly=true' : ''}`;
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch calculators: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch calculators');
-      }
-      
-      return data.calculators || [];
-    } catch (error) {
-      console.error('Error fetching calculators:', error);
-      throw error;
-    }
-  }
-
-  // Get single calculator
-  async getCalculator(id: string): Promise<Calculator | null> {
-    try {
-      const response = await fetch(`/api/calculators/${id}`);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null;
-        }
-        throw new Error(`Failed to fetch calculator: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch calculator');
-      }
-      
-      return data.calculator;
-    } catch (error) {
-      console.error('Error fetching calculator:', error);
-      throw error;
-    }
-  }
-
-  // Create new calculator
+  // Calculator Management
   async createCalculator(calculatorData: {
     name: string;
+    category: string;
     description: string;
     url?: string;
     calculatorType?: 'url' | 'code';
-    codeContent?: string;
+    code?: string;
     fileName?: string;
     orderIndex?: number;
+    icon?: string;
+    color?: string;
+    isActive?: boolean;
     isPublished?: boolean;
-  }): Promise<Calculator> {
-    try {
-      const response = await fetch('/api/calculators', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(calculatorData),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to create calculator: ${response.status}`);
+    fields?: Array<{
+      name: string;
+      label: string;
+      type: string;
+      placeholder?: string;
+      required: boolean;
+    }>;
+  }): Promise<CalculatorTool> {
+    const calculatorId = generateId();
+    
+    // Get the highest order index if not provided
+    let orderIndex = calculatorData.orderIndex;
+    if (orderIndex === undefined) {
+      const existingCalculators = await this.getAllCalculators();
+      orderIndex = existingCalculators.length;
+    }
+    
+    const calculatorType = calculatorData.calculatorType || 'code';
+    
+    // Validate required fields based on calculator type
+    if (calculatorType === 'url' && !calculatorData.url) {
+      throw new Error('URL is required for URL-based calculators');
+    }
+    if (calculatorType === 'code' && !calculatorData.code) {
+      throw new Error('Code content is required for code-based calculators');
+    }
+    
+    const newCalculator: CalculatorTool = {
+      id: calculatorId,
+      name: calculatorData.name,
+      category: calculatorData.category,
+      description: calculatorData.description,
+      url: calculatorData.url || `/calculator/${calculatorId}`,
+      calculatorType,
+      code: calculatorData.code,
+      fileName: calculatorData.fileName,
+      orderIndex,
+      icon: calculatorData.icon || 'Calculator',
+      color: calculatorData.color || 'bg-blue-500',
+      isActive: calculatorData.isActive ?? true,
+      isPublished: calculatorData.isPublished ?? true,
+      fields: calculatorData.fields || []
+    };
+
+    calculators.set(calculatorId, newCalculator);
+    return newCalculator;
+  }
+
+  async getCalculator(calculatorId: number): Promise<CalculatorTool | null> {
+    return calculators.get(calculatorId) || null;
+  }
+
+  async getAllCalculators(activeOnly: boolean = false): Promise<CalculatorTool[]> {
+    const allCalculators = Array.from(calculators.values());
+    
+    if (activeOnly) {
+      return allCalculators
+        .filter(calc => calc.isActive && calc.isPublished)
+        .sort((a, b) => a.orderIndex - b.orderIndex);
+    }
+    
+    return allCalculators.sort((a, b) => a.orderIndex - b.orderIndex);
+  }
+
+  async updateCalculator(calculatorId: number, updates: Partial<CalculatorTool>): Promise<void> {
+    const calculator = calculators.get(calculatorId);
+    if (!calculator) {
+      throw new Error('Calculator not found');
+    }
+
+    const updatedCalculator = {
+      ...calculator,
+      ...updates,
+      id: calculatorId // Ensure ID doesn't change
+    };
+
+    calculators.set(calculatorId, updatedCalculator);
+  }
+
+  async deleteCalculator(calculatorId: number): Promise<void> {
+    if (!calculators.has(calculatorId)) {
+      throw new Error('Calculator not found');
+    }
+    calculators.delete(calculatorId);
+  }
+
+  async reorderCalculators(calculatorIds: number[]): Promise<void> {
+    // Update order index for each calculator
+    for (let i = 0; i < calculatorIds.length; i++) {
+      const calculator = calculators.get(calculatorIds[i]);
+      if (calculator) {
+        calculator.orderIndex = i;
+        calculators.set(calculatorIds[i], calculator);
       }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to create calculator');
-      }
-      
-      return data.calculator;
-    } catch (error) {
-      console.error('Error creating calculator:', error);
-      throw error;
     }
   }
 
-  // Update calculator
-  async updateCalculator(id: string, updates: Partial<Calculator>): Promise<Calculator> {
-    try {
-      const response = await fetch(`/api/calculators/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updates),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to update calculator: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to update calculator');
-      }
-      
-      return data.calculator;
-    } catch (error) {
-      console.error('Error updating calculator:', error);
-      throw error;
+  async toggleActive(calculatorId: number): Promise<void> {
+    const calculator = calculators.get(calculatorId);
+    if (calculator) {
+      calculator.isActive = !calculator.isActive;
+      calculators.set(calculatorId, calculator);
     }
   }
 
-  // Delete calculator
-  async deleteCalculator(id: string): Promise<void> {
-    try {
-      const response = await fetch(`/api/calculators/${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to delete calculator: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to delete calculator');
-      }
-    } catch (error) {
-      console.error('Error deleting calculator:', error);
-      throw error;
+  async togglePublished(calculatorId: number): Promise<void> {
+    const calculator = calculators.get(calculatorId);
+    if (calculator) {
+      calculator.isPublished = !calculator.isPublished;
+      calculators.set(calculatorId, calculator);
     }
   }
 
-  // Validate calculator URL
+  // URL validation
   validateUrl(url: string): boolean {
     try {
       new URL(url);
@@ -166,25 +139,21 @@ export class CalculatorService {
     }
   }
 
-  // Get calculator URL for display/access
-  getCalculatorUrl(calculator: Calculator): string {
-    if (calculator.calculatorType === 'url' && calculator.url) {
-      return calculator.url;
-    }
-    
-    if (calculator.calculatorType === 'code' && calculator.fileName) {
-      return `/calculators/${calculator.fileName}`;
-    }
-    
-    return '#';
+  // Calculate file upload stats
+  getUploadedCalculatorsCount(): number {
+    return Array.from(calculators.values()).filter(calc => calc.calculatorType === 'url').length;
   }
 
-  // Check if calculator can be opened
-  canOpenCalculator(calculator: Calculator): boolean {
-    return calculator.active && calculator.isPublished && (
-      (calculator.calculatorType === 'url' && !!calculator.url) ||
-      (calculator.calculatorType === 'code' && !!calculator.fileName)
-    );
+  getCodeBasedCalculatorsCount(): number {
+    return Array.from(calculators.values()).filter(calc => calc.calculatorType === 'code').length;
+  }
+
+  getCategoryStats(): Record<string, number> {
+    const stats: Record<string, number> = {};
+    Array.from(calculators.values()).forEach(calc => {
+      stats[calc.category] = (stats[calc.category] || 0) + 1;
+    });
+    return stats;
   }
 }
 

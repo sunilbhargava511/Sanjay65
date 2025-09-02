@@ -42,6 +42,11 @@ export async function POST(request: NextRequest) {
       icon = 'Calculator',
       color = 'bg-blue-500',
       isActive = true,
+      calculatorType = 'code',
+      code,
+      fileName,
+      orderIndex,
+      isPublished = true,
       fields = []
     } = body;
 
@@ -52,8 +57,29 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    
+    // Validate required fields based on calculator type
+    if (calculatorType === 'url' && !url) {
+      return NextResponse.json(
+        { error: 'URL is required for URL-based calculators' },
+        { status: 400 }
+      );
+    }
+    if (calculatorType === 'code' && !code) {
+      return NextResponse.json(
+        { error: 'Code content is required for code-based calculators' },
+        { status: 400 }
+      );
+    }
 
     const calculatorId = generateId();
+    
+    // Get the highest order index if not provided
+    let finalOrderIndex = orderIndex;
+    if (finalOrderIndex === undefined) {
+      const existingCalculators = Array.from(calculators.values());
+      finalOrderIndex = existingCalculators.length;
+    }
     
     const newCalculator: CalculatorTool = {
       id: calculatorId,
@@ -64,6 +90,11 @@ export async function POST(request: NextRequest) {
       icon,
       color,
       isActive,
+      calculatorType,
+      code: code || undefined,
+      fileName,
+      orderIndex: finalOrderIndex,
+      isPublished,
       fields: Array.isArray(fields) ? fields : []
     };
 

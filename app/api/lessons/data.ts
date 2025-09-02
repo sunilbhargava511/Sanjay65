@@ -9,9 +9,14 @@ export interface Lesson {
   difficulty: string;
   description: string;
   content: string;
+  videoUrl?: string; // YouTube URL
+  videoSummary?: string; // Content to display below video
+  startMessage?: string; // Text intro message
+  orderIndex: number; // For ordering lessons
   icon: string;
   color: string;
   completed: boolean;
+  active: boolean; // To enable/disable lessons
 }
 
 // Shared lessons Map that all routes can access
@@ -28,6 +33,11 @@ if (lessons.size === 0) {
     icon: 'PiggyBank',
     color: 'bg-green-500',
     description: 'Learn how to calculate the minimum amount you need to save each month for financial security.',
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    startMessage: 'Welcome to your first lesson on financial security. Let\'s explore how to determine your ideal savings rate.',
+    videoSummary: 'This video covers the fundamentals of calculating your personal save number based on your income and expenses.',
+    orderIndex: 0,
+    active: true,
     content: `Your "Save Number" is the minimum amount you should save each month to build financial security. Here's how to calculate it:
 
 **Step 1: Calculate Monthly Expenses**
@@ -67,6 +77,8 @@ Save Number = $3,000 × 0.20 = $600/month
     icon: 'CreditCard',
     color: 'bg-blue-500',
     description: 'Calculate how much you can spend guilt-free after covering savings and essentials.',
+    orderIndex: 1,
+    active: true,
     content: `Your "Spend Number" is the amount you can spend on discretionary items without guilt. Here's the formula:
 
 **Spend Number = Income - Fixed Expenses - Save Number**
@@ -115,6 +127,8 @@ Spend Number = Income - Fixed Expenses - Save Number
     icon: 'Home',
     color: 'bg-orange-500',
     description: 'Build a safety net that protects you from unexpected expenses and job loss.',
+    orderIndex: 2,
+    active: true,
     content: `An emergency fund is your financial safety net. Here's everything you need to know:
 
 **What is an Emergency Fund?**
@@ -171,6 +185,8 @@ If you use emergency fund money, make replenishing it your top priority.`,
     icon: 'TrendingUp',
     color: 'bg-red-500',
     description: 'Two proven strategies to pay off debt faster and save money on interest.',
+    orderIndex: 3,
+    active: true,
     content: `Choose the right debt payoff strategy for your situation:
 
 **Debt Avalanche Method (Math-Optimal)**

@@ -15,6 +15,11 @@ interface CalculatorTool {
   icon: string;
   color: string;
   isActive: boolean;
+  calculatorType: 'url' | 'code';
+  code?: string;
+  fileName?: string;
+  orderIndex: number;
+  isPublished: boolean;
   fields: Array<{
     name: string;
     label: string;
@@ -37,6 +42,10 @@ export default function CalculatorsManagement() {
     icon: 'Calculator',
     color: 'bg-blue-500',
     isActive: true,
+    calculatorType: 'code' as 'url' | 'code',
+    code: '',
+    fileName: '',
+    isPublished: true,
     fields: '[]'
   });
 
@@ -68,7 +77,8 @@ export default function CalculatorsManagement() {
       
       const payload = {
         ...formData,
-        fields: JSON.parse(formData.fields || '[]')
+        fields: JSON.parse(formData.fields || '[]'),
+        code: formData.code || undefined
       };
       
       const response = await fetch(url, {
@@ -120,6 +130,7 @@ export default function CalculatorsManagement() {
       icon: calculator.icon,
       color: calculator.color,
       isActive: calculator.isActive,
+      code: calculator.code || '',
       fields: JSON.stringify(calculator.fields || [], null, 2)
     });
     setShowAddModal(true);
@@ -136,6 +147,7 @@ export default function CalculatorsManagement() {
       icon: 'Calculator',
       color: 'bg-blue-500',
       isActive: true,
+      code: '',
       fields: '[]'
     });
   };
@@ -370,12 +382,39 @@ export default function CalculatorsManagement() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Calculator Code (JavaScript)
+                  </label>
+                  <textarea
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    rows={10}
+                    placeholder={`// Example calculator function
+function calculate(inputs) {
+  const { income, expenses } = inputs;
+  const savings = income - expenses;
+  const savingsRate = (savings / income) * 100;
+  
+  return {
+    monthlySavings: savings,
+    savingsRate: savingsRate.toFixed(2) + '%',
+    yearlyProjection: savings * 12
+  };
+}`}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Define your calculator logic as a JavaScript function that takes inputs and returns results
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Form Fields (JSON)
                   </label>
                   <textarea
                     value={formData.fields}
                     onChange={(e) => setFormData({ ...formData, fields: e.target.value })}
-                    rows={8}
+                    rows={6}
                     placeholder={`[
   {
     "name": "income",

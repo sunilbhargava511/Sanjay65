@@ -1,146 +1,156 @@
-import { Lesson } from '@/app/api/lessons/route';
-
-export interface LessonFilters {
-  category?: 'general' | 'young-adult' | 'older-adult';
-  activeOnly?: boolean;
-  limit?: number;
-}
+import { Lesson, lessons, generateId } from '@/app/api/lessons/data';
 
 export class LessonService {
-  private baseUrl: string;
+  
+  // Lesson Management
+  async createLesson(lessonData: {
+    title: string;
+    category: string;
+    duration: string;
+    difficulty: string;
+    description: string;
+    content: string;
+    videoUrl?: string;
+    videoSummary?: string;
+    startMessage?: string;
+    orderIndex?: number;
+    icon?: string;
+    color?: string;
+    active?: boolean;
+  }): Promise<Lesson> {
+    const lessonId = generateId();
+    
+    // Get the highest order index if not provided
+    let orderIndex = lessonData.orderIndex;
+    if (orderIndex === undefined) {
+      const existingLessons = await this.getAllLessons();
+      orderIndex = existingLessons.length;
+    }
+    
+    const newLesson: Lesson = {
+      id: lessonId,
+      title: lessonData.title,
+      category: lessonData.category,
+      duration: lessonData.duration,
+      difficulty: lessonData.difficulty,
+      description: lessonData.description,
+      content: lessonData.content,
+      videoUrl: lessonData.videoUrl,
+      videoSummary: lessonData.videoSummary,
+      startMessage: lessonData.startMessage,
+      orderIndex,
+      icon: lessonData.icon || 'BookOpen',
+      color: lessonData.color || 'bg-blue-500',
+      active: lessonData.active ?? true,
+      completed: false
+    };
 
-  constructor() {
-    this.baseUrl = '/api/lessons';
+    lessons.set(lessonId, newLesson);
+    return newLesson;
   }
 
-  async getLessons(filters: LessonFilters = {}): Promise<{ lessons: Lesson[], count: number, categories: Record<string, number> }> {
-    const searchParams = new URLSearchParams();
+  async getLesson(lessonId: number): Promise<Lesson | null> {
+    return lessons.get(lessonId) || null;
+  }
+
+  async getAllLessons(activeOnly: boolean = false): Promise<Lesson[]> {
+    const allLessons = Array.from(lessons.values());
     
-    if (filters.category) {
-      searchParams.set('category', filters.category);
+    if (activeOnly) {
+      return allLessons
+        .filter(lesson => lesson.active)
+        .sort((a, b) => a.orderIndex - b.orderIndex);
     }
     
-    if (filters.activeOnly) {
-      searchParams.set('activeOnly', 'true');
-    }
-    
-    if (filters.limit) {
-      searchParams.set('limit', filters.limit.toString());
+    return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
+  }
+
+  async updateLesson(lessonId: number, updates: Partial<Lesson>): Promise<void> {
+    const lesson = lessons.get(lessonId);
+    if (!lesson) {
+      throw new Error('Lesson not found');
     }
 
-    const url = searchParams.toString() ? `${this.baseUrl}?${searchParams}` : this.baseUrl;
-    
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch lessons: ${response.statusText}`);
+    const updatedLesson = {
+      ...lesson,
+      ...updates,
+      id: lessonId // Ensure ID doesn't change
+    };
+
+    lessons.set(lessonId, updatedLesson);
+  }
+
+  async deleteLesson(lessonId: number): Promise<void> {
+    if (!lessons.has(lessonId)) {
+      throw new Error('Lesson not found');
     }
-    
-    const data = await response.json();
-    
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to fetch lessons');
+    lessons.delete(lessonId);
+  }
+
+  async reorderLessons(lessonIds: number[]): Promise<void> {
+    // Update order index for each lesson
+    for (let i = 0; i < lessonIds.length; i++) {
+      const lesson = lessons.get(lessonIds[i]);
+      if (lesson) {
+        lesson.orderIndex = i;
+        lessons.set(lessonIds[i], lesson);
+      }
     }
+  }
+
+  // Session Management
+  async markLessonCompleted(lessonId: number): Promise<void> {
+    const lesson = lessons.get(lessonId);
+    if (lesson) {
+      lesson.completed = true;
+      lessons.set(lessonId, lesson);
+    }
+  }
+
+  async markLessonIncomplete(lessonId: number): Promise<void> {
+    const lesson = lessons.get(lessonId);
+    if (lesson) {
+      lesson.completed = false;
+      lessons.set(lessonId, lesson);
+    }
+  }
+
+  async getProgress(): Promise<{
+    totalLessons: number;
+    completedLessons: number;
+    percentComplete: number;
+  }> {
+    const allLessons = await this.getAllLessons(true);
+    const completedLessons = allLessons.filter(lesson => lesson.completed);
     
     return {
-      lessons: data.lessons,
-      count: data.count,
-      categories: data.categories
+      totalLessons: allLessons.length,
+      completedLessons: completedLessons.length,
+      percentComplete: allLessons.length > 0 
+        ? Math.round((completedLessons.length / allLessons.length) * 100)
+        : 0
     };
   }
 
-  async createLesson(lessonData: {
-    title: string;
-    description: string;
-    youtubeUrl: string;
-    category?: 'general' | 'young-adult' | 'older-adult';
-    duration?: string;
-    orderIndex?: number;
-    tags?: string[];
-    isPublished?: boolean;
-  }): Promise<Lesson> {
-    const response = await fetch(this.baseUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(lessonData),
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Failed to create lesson: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to create lesson');
-    }
-    
-    return data.lesson;
+  // YouTube URL Validation
+  validateYouTubeUrl(url: string): boolean {
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]+/;
+    return youtubeRegex.test(url);
   }
 
-  extractYouTubeId(url: string): string | null {
-    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
-    const match = url.match(regex);
+  extractYouTubeVideoId(url: string): string | null {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
     return match ? match[1] : null;
   }
 
-  getYouTubeEmbedUrl(url: string): string | null {
-    const videoId = this.extractYouTubeId(url);
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  getYouTubeEmbedUrl(videoId: string): string {
+    return `https://www.youtube.com/embed/${videoId}`;
   }
 
-  getYouTubeThumbnail(url: string): string | null {
-    const videoId = this.extractYouTubeId(url);
-    return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null;
-  }
-
-  formatDuration(duration?: string): string {
-    if (!duration) return '';
-    
-    // Assume duration is in "MM:SS" format
-    const parts = duration.split(':');
-    if (parts.length === 2) {
-      const minutes = parseInt(parts[0], 10);
-      const seconds = parseInt(parts[1], 10);
-      
-      if (minutes === 0) {
-        return `${seconds}s`;
-      } else {
-        return `${minutes}m ${seconds}s`;
-      }
-    }
-    
-    return duration;
-  }
-
-  getCategoryDisplayName(category: string): string {
-    switch (category) {
-      case 'general':
-        return 'General';
-      case 'young-adult':
-        return 'Young Adult';
-      case 'older-adult':
-        return 'Older Adult';
-      default:
-        return category;
-    }
-  }
-
-  getCategoryDescription(category: string): string {
-    switch (category) {
-      case 'general':
-        return 'Essential financial concepts for everyone';
-      case 'young-adult':
-        return 'Financial guidance for starting your career';
-      case 'older-adult':
-        return 'Planning for retirement and later-life finances';
-      default:
-        return '';
-    }
+  getYouTubeThumbnail(videoId: string): string {
+    return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
   }
 }
 
+// Export singleton instance
 export const lessonService = new LessonService();
