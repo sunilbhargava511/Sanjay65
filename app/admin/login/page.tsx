@@ -5,6 +5,9 @@ import LessonManager from '@/components/LessonManager';
 import StripeManager from '@/components/StripeManager';
 import CalculatorUpload from '@/components/CalculatorUpload';
 
+// Force this page to be dynamic - it has components that make API calls
+export const dynamic = 'force-dynamic';
+
 // Admin Guide Content Component
 function AdminGuideContent() {
   const [content, setContent] = useState('');

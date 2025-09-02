@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 
+// Force this page to be dynamic - it makes API calls
+export const dynamic = 'force-dynamic';
+
 export default function UserGuidePage() {
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
