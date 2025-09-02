@@ -80,14 +80,8 @@ export default function Dashboard() {
     }
   ];
 
-  const suggestedTopics = [
-    "Save & Spend Numbers",
-    "Emergency Fund Planning",
-    "Debt Management Strategies",
-    "Retirement Savings",
-    "Budgeting Basics",
-    "Investment vs Debt Payoff"
-  ];
+  const [topicSuggestion, setTopicSuggestion] = useState('');
+  const [topicSubmitted, setTopicSubmitted] = useState(false);
 
   const handleFeedbackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +90,15 @@ export default function Dashboard() {
     setFeedbackSubmitted(true);
     setFeedbackText('');
     setTimeout(() => setFeedbackSubmitted(false), 3000);
+  };
+
+  const handleTopicSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically send to an API
+    console.log('Topic suggested:', topicSuggestion);
+    setTopicSubmitted(true);
+    setTopicSuggestion('');
+    setTimeout(() => setTopicSubmitted(false), 3000);
   };
 
   if (loading) {
@@ -172,32 +175,52 @@ export default function Dashboard() {
 
         {/* Feedback Area */}
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Suggested Topics */}
+          {/* Suggest New Topics */}
           <div className="rounded-xl border border-gray-200 bg-white p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="rounded-lg bg-blue-100 p-2">
-                <HelpCircle className="h-5 w-5 text-blue-600" />
+              <div className="rounded-lg bg-purple-100 p-2">
+                <HelpCircle className="h-5 w-5 text-purple-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Explore Topics</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Suggest New Topics</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Select a topic you'd like to learn about, then ask your question:</p>
-            <div className="space-y-2">
-              {suggestedTopics.map((topic, index) => (
+            <p className="text-sm text-gray-600 mb-4">What financial topics would you like us to cover? Share your ideas!</p>
+            
+            {topicSubmitted ? (
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+                <div className="text-purple-800 font-medium mb-1">Thank you for your suggestion!</div>
+                <div className="text-sm text-purple-700">We'll consider adding this topic to our educational content.</div>
+              </div>
+            ) : (
+              <form onSubmit={handleTopicSubmit} className="space-y-4">
+                <div>
+                  <textarea
+                    value={topicSuggestion}
+                    onChange={(e) => setTopicSuggestion(e.target.value)}
+                    placeholder="Examples:
+• How to negotiate salary increases
+• Understanding stock options and RSUs
+• Tax strategies for freelancers
+• College savings strategies
+• Real estate investment basics
+• Healthcare and insurance planning"
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none text-sm"
+                    required
+                  />
+                </div>
                 <button
-                  key={index}
-                  onClick={() => setFeedbackText(`I have a question about ${topic}: `)}
-                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition text-sm font-medium"
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2 bg-purple-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-purple-700 transition"
                 >
-                  <div className="flex items-center justify-between">
-                    <span>{topic}</span>
-                    <span className="text-gray-400">→</span>
-                  </div>
+                  <Send className="h-4 w-4" />
+                  Suggest Topic
                 </button>
-              ))}
-            </div>
+              </form>
+            )}
+            
             <div className="mt-4 p-3 bg-gray-50 rounded-lg">
               <p className="text-xs text-gray-600">
-                💡 <strong>Tip:</strong> Click a topic above, then type your specific question in the feedback box.
+                💡 <strong>Your input matters:</strong> We prioritize creating content based on what our users want to learn.
               </p>
             </div>
           </div>
