@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test File Calculator</title>
+    <meta name="description" content="Test file description">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        /* Range slider styles */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #3B82F6;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #3B82F6;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: none;
+        }
+
+        /* Icon styles */
+        .icon {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            text-align: center;
+            line-height: 1.25rem;
+            font-size: 1rem;
+        }
+        
+        .lucide-icon {
+            vertical-align: middle;
+        }
+
+        /* Loading states */
+        .calculating {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Ensure full height on mobile */
+        body, html {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Source attribution */
+        .source-info {
+            font-size: 0.75rem;
+            color: #6B7280;
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid #E5E7EB;
+            background: #F9FAFB;
+        }
+    </style>
+</head>
+<body>
+    <!-- Calculator Content -->
+    <div id="app">
+        <div class="flex items-center justify-center min-h-screen bg-gray-100">
+            <div class="text-center p-8">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Source Information -->
+    <div class="source-info no-print">
+        <p>Generated from: test.tsx | Calculator: Test File Calculator</p>
+        <p>Powered by Financial Advisor Platform</p>
+    </div>
+
+    <!-- React Dependencies -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Application Code -->
+    <script type="text/babel">
+        // React hooks - MUST be before component code
+        const { useState, useEffect } = React;
+        
+        // Application code converted from React
+        
+
+        
+        // Component mounting logic
+        const container = document.getElementById('app');
+        const root = ReactDOM.createRoot(container);
+        
+        if (typeof TestCalc !== 'undefined') {
+            root.render(React.createElement(TestCalc));
+            console.log('✅ Calculator loaded');
+        } else {
+            container.innerHTML = '<div class="p-8 text-center text-red-600">Calculator not found</div>';
+            console.error('❌ TestCalc undefined');
+        }
+
+        // Add error boundary
+        window.addEventListener('error', (event) => {
+            console.error('💥 Global error:', event.error);
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('💥 Unhandled promise rejection:', event.reason);
+        });
+    </script>
+</body>
+</html>

@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     const calculatorId = generateId();
     let calculatorUrl = '';
     let fileName = '';
+    let standaloneUrl: string | null = null;
 
     if (calculatorType === 'file') {
       if (!file) {
@@ -60,7 +61,6 @@ export async function POST(request: NextRequest) {
       // Handle different file types with sophisticated processing
       const fileContent = await file.text();
       let processedContent = fileContent;
-      let standaloneUrl: string | null = null;
 
       if (fileExtension === '.tsx' || fileExtension === '.jsx' || fileExtension === '.ts' || fileExtension === '.js') {
         // Use the advanced React-to-HTML converter
