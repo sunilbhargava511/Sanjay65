@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import LessonManager from '@/components/LessonManager';
-import StripeManager from '@/components/StripeManager';
 import CalculatorUpload from '@/components/CalculatorUpload';
 
 // Force this page to be dynamic - it has components that make API calls
@@ -247,7 +246,7 @@ export default function AdminLoginPage() {
   const [accessCode, setAccessCode] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'lessons' | 'calculators' | 'stripe' | 'guide'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'lessons' | 'calculators' | 'guide'>('dashboard');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -323,16 +322,6 @@ export default function AdminLoginPage() {
                 }`}
               >
                 Calculators
-              </button>
-              <button
-                onClick={() => setActiveTab('stripe')}
-                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium border-b-2 transition whitespace-nowrap ${
-                  activeTab === 'stripe'
-                    ? 'border-red-600 text-red-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Stripe
               </button>
               <button
                 onClick={() => setActiveTab('guide')}
@@ -444,9 +433,6 @@ export default function AdminLoginPage() {
             <CalculatorManagement />
           )}
 
-          {activeTab === 'stripe' && (
-            <StripeManager />
-          )}
 
           {activeTab === 'guide' && (
             <AdminGuideContent />

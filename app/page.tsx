@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { getStoredEmail } from '@/lib/guest-cookie';
 
-// Streamlined homepage focused purely on beta conversion
+// Streamlined homepage focused purely on educational conversion
 // Enhanced with modern visuals and prominent philosophy section
 
 function PricingCard({
@@ -12,7 +13,7 @@ function PricingCard({
   blurb,
   highlight = false,
   onLoginHref = "/login",
-  ctaLabel = "Login to get started",
+  ctaLabel = "Get Started",
   disabled = false,
   badge,
 }) {
@@ -54,28 +55,15 @@ function PricingCard({
 export default function ZeroFinanxPricingPage() {
   const router = useRouter();
   const [showPhilosophy, setShowPhilosophy] = useState(false);
+  const [hasEmail, setHasEmail] = useState(false);
   
-  // Check for existing session on page load
+  // Check if user already provided email
   useEffect(() => {
-    const checkSession = () => {
-      try {
-        // Check for passwordless session cookie
-        const sessionCookie = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('passwordless-session='));
-        
-        if (sessionCookie) {
-          // User is already authenticated, redirect to dashboard
-          router.push('/dashboard');
-        }
-      } catch (error) {
-        // If there's any error, just continue showing the home page
-        console.error('Session check failed:', error);
-      }
-    };
-
-    checkSession();
-  }, [router]);
+    const storedEmail = getStoredEmail();
+    if (storedEmail) {
+      setHasEmail(true);
+    }
+  }, []);
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -90,10 +78,10 @@ export default function ZeroFinanxPricingPage() {
 
           <nav className="flex w-24 justify-end">
             <a
-              href="/login"
+              href={hasEmail ? "/dashboard" : "/login"}
               className="inline-flex items-center rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-white hover:shadow-md transition-all duration-200"
             >
-              Login
+              {hasEmail ? "Dashboard" : "Get Started"}
             </a>
           </nav>
         </div>
@@ -141,7 +129,8 @@ export default function ZeroFinanxPricingPage() {
             priceLabel="Free"
             blurb="Get user feedback on education lessons and calculators. Save Number, Spend Number, core financial guidance."
             highlight
-            ctaLabel="Join FREE Beta"
+            ctaLabel={hasEmail ? "Go to Dashboard" : "Join FREE Beta"}
+            onLoginHref={hasEmail ? "/dashboard" : "/login"}
             badge="Limited — 100 spots"
           />
 

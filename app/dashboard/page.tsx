@@ -2,96 +2,48 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Book, Calculator, MessageSquare, User, LogOut, BookOpen, FileText, Settings } from 'lucide-react';
+import { Book, Calculator, MessageSquare, User, BookOpen, FileText, Settings, ArrowLeft } from 'lucide-react';
+import { getStoredEmail } from '@/lib/guest-cookie';
 
 export default function Dashboard() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for passwordless session
-    const checkSession = async () => {
-      try {
-        // Check for passwordless session cookie
-        const sessionCookie = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('passwordless-session='));
-        
-        if (sessionCookie) {
-          // Decode JWT to get email (in production, validate on server)
-          const token = sessionCookie.split('=')[1];
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          setUserEmail(payload.email);
-        } else {
-          // Check URL params for immediate redirect from magic link
-          const urlParams = new URLSearchParams(window.location.search);
-          const fromMagicLink = urlParams.get('from') === 'magic-link';
-          
-          if (fromMagicLink) {
-            // Give cookie time to be set
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
-          } else {
-            // No session, redirect to login
-            router.push('/login');
-          }
-        }
-      } catch (error) {
-        console.error('Session check failed:', error);
-        router.push('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkSession();
-  }, [router]);
-
-  const handleLogout = () => {
-    // Clear session cookie
-    document.cookie = 'passwordless-session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    router.push('/');
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white">
-        <div className="animate-pulse">
-          <div className="h-8 w-32 bg-gray-200 rounded mb-4"></div>
-          <div className="h-4 w-48 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
-  }
+    // Get email from guest cookie if available
+    const storedEmail = getStoredEmail();
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
       <header className="sticky top-0 z-10 border-b border-gray-100 bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          {/* Empty left area */}
-          <div className="w-24" aria-hidden="true" />
+          {/* Left - Back to home */}
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="text-sm">Home</span>
+          </button>
 
           {/* Center title */}
           <div className="text-center">
             <h1 className="text-lg font-semibold tracking-tight">zerofinanx</h1>
-            <p className="text-xs text-gray-500">Zero Financial Anxiety - Dashboard</p>
+            <p className="text-xs text-gray-500">Zero Financial Anxiety</p>
           </div>
 
-          {/* Right actions */}
-          <div className="flex w-24 items-center justify-end gap-3">
-            <span className="text-xs text-gray-600 hidden sm:block">
-              {userEmail?.split('@')[0]}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-2 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50"
-            >
-              <LogOut className="h-3 w-3" />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
+          {/* Right - User email if available */}
+          <div className="flex w-24 items-center justify-end">
+            {userEmail && (
+              <span className="text-xs text-gray-600 hidden sm:block">
+                {userEmail.split('@')[0]}
+              </span>
+            )}
           </div>
         </div>
       </header>
@@ -101,10 +53,10 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <section className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Welcome back{userEmail ? `, ${userEmail.split('@')[0]}` : ''}!
+            Welcome{userEmail ? ` back, ${userEmail.split('@')[0]}` : ' to ZeroFinanx'}!
           </h2>
           <p className="mt-3 text-gray-600">
-            Your journey to Zero Financial Anxiety continues here. Let's build your personalized financial plan.
+            Your journey to Zero Financial Anxiety starts here. Explore our financial education tools and calculators.
           </p>
         </section>
 
@@ -125,7 +77,7 @@ export default function Dashboard() {
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-6">
-              Master personal finance fundamentals with bite-sized lessons. Learn at your own pace with U.S.-focused content.
+              Master personal finance fundamentals with bite-sized lessons. Learn at your own pace with practical content.
             </p>
             <div className="text-purple-600 font-medium text-sm group-hover:text-purple-700">
               Browse Lessons →
