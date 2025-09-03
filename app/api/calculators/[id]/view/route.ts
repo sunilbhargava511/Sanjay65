@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { calculators } from '../../data';
+import { calculatorRepository } from '@/lib/repositories/calculators';
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { id: idString } = await params;
     const id = parseInt(idString);
-    const calculator = calculators.get(id);
+    const calculator = calculatorRepository.findById(id);
     
     if (!calculator) {
       return NextResponse.json(

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { lessons, Lesson } from '../data';
+import { lessonRepository } from '@/lib/repositories/lessons';
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { id: idString } = await params;
     const id = parseInt(idString);
-    const lesson = lessons.get(id);
+    const lesson = lessonRepository.findById(id);
     
     if (!lesson) {
       return NextResponse.json(
@@ -34,7 +34,7 @@ export async function PUT(
   try {
     const { id: idString } = await params;
     const id = parseInt(idString);
-    const lesson = lessons.get(id);
+    const lesson = lessonRepository.findById(id);
     
     if (!lesson) {
       return NextResponse.json(
@@ -61,24 +61,28 @@ export async function PUT(
     } = body;
 
     // Update lesson with new data
-    const updatedLesson: Lesson = {
-      ...lesson,
-      title: title?.trim() || lesson.title,
-      category: category || lesson.category,
-      duration: duration?.trim() || lesson.duration,
-      difficulty: difficulty || lesson.difficulty,
-      description: description?.trim() || lesson.description,
-      content: content?.trim() || lesson.content,
-      videoUrl: videoUrl !== undefined ? videoUrl?.trim() : lesson.videoUrl,
-      videoSummary: videoSummary !== undefined ? videoSummary?.trim() : lesson.videoSummary,
-      startMessage: startMessage !== undefined ? startMessage?.trim() : lesson.startMessage,
-      orderIndex: orderIndex !== undefined ? orderIndex : lesson.orderIndex,
-      icon: icon || lesson.icon,
-      color: color || lesson.color,
-      active: active !== undefined ? active : lesson.active
-    };
+    const updatedLesson = lessonRepository.update(id, {
+      title: title?.trim(),
+      category,
+      duration: duration?.trim(),
+      difficulty,
+      description: description?.trim(),
+      content: content?.trim(),
+      videoUrl: videoUrl !== undefined ? videoUrl?.trim() : undefined,
+      videoSummary: videoSummary !== undefined ? videoSummary?.trim() : undefined,
+      startMessage: startMessage !== undefined ? startMessage?.trim() : undefined,
+      orderIndex,
+      icon,
+      color,
+      active
+    });
 
-    lessons.set(id, updatedLesson);
+    if (!updatedLesson) {
+      return NextResponse.json(
+        { error: 'Failed to update lesson' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(updatedLesson);
   } catch (error) {
@@ -97,7 +101,7 @@ export async function DELETE(
   try {
     const { id: idString } = await params;
     const id = parseInt(idString);
-    const lesson = lessons.get(id);
+    const lesson = lessonRepository.findById(id);
     
     if (!lesson) {
       return NextResponse.json(
@@ -106,7 +110,14 @@ export async function DELETE(
       );
     }
 
-    lessons.delete(id);
+    const deleted = lessonRepository.delete(id);
+    
+    if (!deleted) {
+      return NextResponse.json(
+        { error: 'Failed to delete lesson' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ message: 'Lesson deleted successfully' });
   } catch (error) {

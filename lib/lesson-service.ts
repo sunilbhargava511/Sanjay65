@@ -1,4 +1,15 @@
-import { Lesson, lessons, generateId } from '@/app/api/lessons/data';
+// Only import repository on server side
+let lessonRepository: any = null;
+let Lesson: any = null;
+
+if (typeof window === 'undefined') {
+  // Server side import
+  const { lessonRepository: repo, Lesson: lesson } = require('@/lib/repositories/lessons');
+  lessonRepository = repo;
+  Lesson = lesson;
+}
+
+export type Lesson = any;
 
 export class LessonService {
   
@@ -18,17 +29,15 @@ export class LessonService {
     color?: string;
     active?: boolean;
   }): Promise<Lesson> {
-    const lessonId = generateId();
     
     // Get the highest order index if not provided
     let orderIndex = lessonData.orderIndex;
     if (orderIndex === undefined) {
-      const existingLessons = await this.getAllLessons();
+      const existingLessons = lessonRepository.findAll();
       orderIndex = existingLessons.length;
     }
     
-    const newLesson: Lesson = {
-      id: lessonId,
+    const newLesson = lessonRepository.create({
       title: lessonData.title,
       category: lessonData.category,
       duration: lessonData.duration,
@@ -42,22 +51,28 @@ export class LessonService {
       icon: lessonData.icon || 'BookOpen',
       color: lessonData.color || 'bg-blue-500',
       active: lessonData.active ?? true,
-      completed: false
-    };
+      completed: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
 
-    lessons.set(lessonId, newLesson);
     return newLesson;
   }
 
   async getLesson(lessonId: number): Promise<Lesson | null> {
-    return lessons.get(lessonId) || null;
+    return lessonRepository.findById(lessonId);
   }
 
   async getAllLessons(activeOnly: boolean = false): Promise<Lesson[]> {
-    try {
-      // Check if we're in browser environment
-      if (typeof window !== 'undefined') {
-        console.log('🔄 Fetching lessons from API...');
+    // Check if we're running on the server side
+    if (typeof window === 'undefined' && lessonRepository) {
+      // Server side: use repository directly
+      return activeOnly 
+        ? lessonRepository.findActive()
+        : lessonRepository.findAll();
+    } else {
+      // Client side: fetch from API
+      try {
         const response = await fetch('/api/lessons', {
           method: 'GET',
           headers: {
@@ -71,7 +86,6 @@ export class LessonService {
         }
         
         const allLessons: Lesson[] = await response.json();
-        console.log('✅ Fetched lessons from API:', allLessons.length, 'lessons');
         
         if (activeOnly) {
           return allLessons
@@ -80,31 +94,10 @@ export class LessonService {
         }
         
         return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
-      } else {
-        console.log('🔧 Server-side: using local data');
-        // Server-side: use local data
-        const allLessons = Array.from(lessons.values());
-        
-        if (activeOnly) {
-          return allLessons
-            .filter(lesson => lesson.active)
-            .sort((a, b) => a.orderIndex - b.orderIndex);
-        }
-        
-        return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
+      } catch (error) {
+        console.error('Error fetching lessons from API:', error);
+        return [];
       }
-    } catch (error) {
-      console.error('❌ Error fetching lessons from API:', error);
-      // Fallback to local data if API fails
-      const allLessons = Array.from(lessons.values());
-      
-      if (activeOnly) {
-        return allLessons
-          .filter(lesson => lesson.active)
-          .sort((a, b) => a.orderIndex - b.orderIndex);
-      }
-      
-      return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
     }
   }
 
@@ -114,53 +107,33 @@ export class LessonService {
   }
 
   async updateLesson(lessonId: number, updates: Partial<Lesson>): Promise<void> {
-    const lesson = lessons.get(lessonId);
-    if (!lesson) {
+    const updatedLesson = lessonRepository.update(lessonId, updates);
+    if (!updatedLesson) {
       throw new Error('Lesson not found');
     }
-
-    const updatedLesson = {
-      ...lesson,
-      ...updates,
-      id: lessonId // Ensure ID doesn't change
-    };
-
-    lessons.set(lessonId, updatedLesson);
   }
 
   async deleteLesson(lessonId: number): Promise<void> {
-    if (!lessons.has(lessonId)) {
+    const deleted = lessonRepository.delete(lessonId);
+    if (!deleted) {
       throw new Error('Lesson not found');
     }
-    lessons.delete(lessonId);
   }
 
   async reorderLessons(lessonIds: number[]): Promise<void> {
     // Update order index for each lesson
     for (let i = 0; i < lessonIds.length; i++) {
-      const lesson = lessons.get(lessonIds[i]);
-      if (lesson) {
-        lesson.orderIndex = i;
-        lessons.set(lessonIds[i], lesson);
-      }
+      lessonRepository.update(lessonIds[i], { orderIndex: i });
     }
   }
 
   // Session Management
   async markLessonCompleted(lessonId: number): Promise<void> {
-    const lesson = lessons.get(lessonId);
-    if (lesson) {
-      lesson.completed = true;
-      lessons.set(lessonId, lesson);
-    }
+    lessonRepository.update(lessonId, { completed: true });
   }
 
   async markLessonIncomplete(lessonId: number): Promise<void> {
-    const lesson = lessons.get(lessonId);
-    if (lesson) {
-      lesson.completed = false;
-      lessons.set(lessonId, lesson);
-    }
+    lessonRepository.update(lessonId, { completed: false });
   }
 
   async getProgress(): Promise<{

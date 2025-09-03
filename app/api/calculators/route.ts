@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { calculators, CalculatorTool, generateId } from './data';
+import { calculatorRepository } from '@/lib/repositories/calculators';
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,20 +7,15 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const activeOnly = searchParams.get('active') === 'true';
     
-    let calculatorList = Array.from(calculators.values());
+    let calculators = activeOnly 
+      ? calculatorRepository.findPublished()
+      : calculatorRepository.findAll();
     
     if (category && category !== 'all') {
-      calculatorList = calculatorList.filter(calc => calc.category === category);
+      calculators = calculators.filter(calc => calc.category === category);
     }
-    
-    if (activeOnly) {
-      calculatorList = calculatorList.filter(calc => calc.isActive);
-    }
-    
-    // Sort by id for consistent ordering
-    calculatorList.sort((a, b) => a.id - b.id);
 
-    return NextResponse.json(calculatorList);
+    return NextResponse.json(calculators);
 
   } catch (error) {
     console.error('Error fetching calculators:', error);
@@ -48,6 +43,7 @@ export async function POST(request: NextRequest) {
       artifactUrl,
       orderIndex,
       isPublished = true,
+      content,
       fields = []
     } = body;
 
@@ -73,34 +69,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const calculatorId = generateId();
-    
-    // Get the highest order index if not provided
+    // Get the next available order index if not provided
     let finalOrderIndex = orderIndex;
     if (finalOrderIndex === undefined) {
-      const existingCalculators = Array.from(calculators.values());
+      const existingCalculators = calculatorRepository.findAll();
       finalOrderIndex = existingCalculators.length;
     }
+
+    // Get next ID for URL generation
+    const nextId = calculatorRepository.getNextId();
     
-    const newCalculator: CalculatorTool = {
-      id: calculatorId,
+    const newCalculator = calculatorRepository.create({
       name: name.trim(),
       category,
       description: description.trim(),
-      url: url?.trim() || `/calculator/${calculatorId}`,
+      url: url?.trim() || `/calculator/${nextId}`,
       icon,
       color,
       isActive,
       calculatorType,
       code: code || undefined,
+      content: content || undefined,
       fileName,
       artifactUrl,
       orderIndex: finalOrderIndex,
       isPublished,
       fields: Array.isArray(fields) ? fields : []
-    };
-
-    calculators.set(calculatorId, newCalculator);
+    });
 
     return NextResponse.json(newCalculator, { status: 201 });
 

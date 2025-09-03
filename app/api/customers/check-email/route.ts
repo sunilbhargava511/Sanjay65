@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isValidEmail, normalizeEmail } from '@/lib/cookies';
-
-// Import the customers storage from the main customers route
-// In production, this would access the same database
-const customers: Map<string, any> = new Map();
+import { userRepository } from '@/lib/repositories/users';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,8 +25,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if customer exists
-    const customerExists = customers.has(normalizedEmail);
-    const customer = customerExists ? customers.get(normalizedEmail) : null;
+    const customer = userRepository.findByEmail(normalizedEmail);
+    const customerExists = customer !== null;
 
     return NextResponse.json({
       exists: customerExists,

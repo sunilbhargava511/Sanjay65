@@ -1,6 +1,15 @@
-import { CalculatorTool, calculators, generateId } from '@/app/api/calculators/data';
+// Only import repository on server side
+let calculatorRepository: any = null;
+let CalculatorTool: any = null;
 
-export type Calculator = CalculatorTool;
+if (typeof window === 'undefined') {
+  // Server side import
+  const { calculatorRepository: repo, CalculatorTool: tool } = require('@/lib/repositories/calculators');
+  calculatorRepository = repo;
+  CalculatorTool = tool;
+}
+
+export type Calculator = any;
 
 export class CalculatorService {
   
@@ -26,12 +35,11 @@ export class CalculatorService {
       required: boolean;
     }>;
   }): Promise<CalculatorTool> {
-    const calculatorId = generateId();
     
     // Get the highest order index if not provided
     let orderIndex = calculatorData.orderIndex;
     if (orderIndex === undefined) {
-      const existingCalculators = await this.getAllCalculators();
+      const existingCalculators = calculatorRepository.findAll();
       orderIndex = existingCalculators.length;
     }
     
@@ -45,12 +53,11 @@ export class CalculatorService {
       throw new Error('Code content is required for code-based calculators');
     }
     
-    const newCalculator: CalculatorTool = {
-      id: calculatorId,
+    const newCalculator = calculatorRepository.create({
       name: calculatorData.name,
       category: calculatorData.category,
       description: calculatorData.description,
-      url: calculatorData.url || `/calculator/${calculatorId}`,
+      url: calculatorData.url || '/temp',
       calculatorType,
       code: calculatorData.code,
       fileName: calculatorData.fileName,
@@ -60,94 +67,77 @@ export class CalculatorService {
       isActive: calculatorData.isActive ?? true,
       isPublished: calculatorData.isPublished ?? true,
       fields: calculatorData.fields || []
-    };
+    });
 
-    calculators.set(calculatorId, newCalculator);
+    // Update URL with real ID if needed
+    if (!calculatorData.url) {
+      calculatorRepository.update(newCalculator.id, { 
+        url: `/calculator/${newCalculator.id}` 
+      });
+    }
+
     return newCalculator;
   }
 
   async getCalculator(calculatorId: number): Promise<CalculatorTool | null> {
-    return calculators.get(calculatorId) || null;
+    return calculatorRepository.findById(calculatorId);
   }
 
-  async getAllCalculators(activeOnly: boolean = false): Promise<CalculatorTool[]> {
-    try {
-      // Fetch from API instead of using local data
-      const response = await fetch('/api/calculators');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch calculators: ${response.statusText}`);
+  async getAllCalculators(activeOnly: boolean = false): Promise<Calculator[]> {
+    // Check if we're running on the server side
+    if (typeof window === 'undefined' && calculatorRepository) {
+      // Server side: use repository directly
+      return activeOnly 
+        ? calculatorRepository.findPublished()
+        : calculatorRepository.findAll();
+    } else {
+      // Client side: fetch from API
+      try {
+        const response = await fetch(`/api/calculators${activeOnly ? '?active=true' : ''}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch calculators: ${response.statusText}`);
+        }
+        const calculators: Calculator[] = await response.json();
+        return calculators;
+      } catch (error) {
+        console.error('Error fetching calculators from API:', error);
+        return [];
       }
-      
-      const allCalculators: CalculatorTool[] = await response.json();
-      
-      if (activeOnly) {
-        return allCalculators
-          .filter(calc => calc.isActive && calc.isPublished)
-          .sort((a, b) => a.orderIndex - b.orderIndex);
-      }
-      
-      return allCalculators.sort((a, b) => a.orderIndex - b.orderIndex);
-    } catch (error) {
-      console.error('Error fetching calculators from API:', error);
-      // Fallback to local data if API fails
-      const allCalculators = Array.from(calculators.values());
-      
-      if (activeOnly) {
-        return allCalculators
-          .filter(calc => calc.isActive && calc.isPublished)
-          .sort((a, b) => a.orderIndex - b.orderIndex);
-      }
-      
-      return allCalculators.sort((a, b) => a.orderIndex - b.orderIndex);
     }
   }
 
   async updateCalculator(calculatorId: number, updates: Partial<CalculatorTool>): Promise<void> {
-    const calculator = calculators.get(calculatorId);
-    if (!calculator) {
+    const updatedCalculator = calculatorRepository.update(calculatorId, updates);
+    if (!updatedCalculator) {
       throw new Error('Calculator not found');
     }
-
-    const updatedCalculator = {
-      ...calculator,
-      ...updates,
-      id: calculatorId // Ensure ID doesn't change
-    };
-
-    calculators.set(calculatorId, updatedCalculator);
   }
 
   async deleteCalculator(calculatorId: number): Promise<void> {
-    if (!calculators.has(calculatorId)) {
+    const deleted = calculatorRepository.delete(calculatorId);
+    if (!deleted) {
       throw new Error('Calculator not found');
     }
-    calculators.delete(calculatorId);
   }
 
   async reorderCalculators(calculatorIds: number[]): Promise<void> {
     // Update order index for each calculator
     for (let i = 0; i < calculatorIds.length; i++) {
-      const calculator = calculators.get(calculatorIds[i]);
-      if (calculator) {
-        calculator.orderIndex = i;
-        calculators.set(calculatorIds[i], calculator);
-      }
+      calculatorRepository.update(calculatorIds[i], { orderIndex: i });
     }
   }
 
   async toggleActive(calculatorId: number): Promise<void> {
-    const calculator = calculators.get(calculatorId);
+    const calculator = calculatorRepository.findById(calculatorId);
     if (calculator) {
-      calculator.isActive = !calculator.isActive;
-      calculators.set(calculatorId, calculator);
+      calculatorRepository.update(calculatorId, { isActive: !calculator.isActive });
     }
   }
 
   async togglePublished(calculatorId: number): Promise<void> {
-    const calculator = calculators.get(calculatorId);
+    const calculator = calculatorRepository.findById(calculatorId);
     if (calculator) {
-      calculator.isPublished = !calculator.isPublished;
-      calculators.set(calculatorId, calculator);
+      calculatorRepository.update(calculatorId, { isPublished: !calculator.isPublished });
     }
   }
 
@@ -163,16 +153,16 @@ export class CalculatorService {
 
   // Calculate file upload stats
   getUploadedCalculatorsCount(): number {
-    return Array.from(calculators.values()).filter(calc => calc.calculatorType === 'url').length;
+    return calculatorRepository.findAll().filter(calc => calc.calculatorType === 'url').length;
   }
 
   getCodeBasedCalculatorsCount(): number {
-    return Array.from(calculators.values()).filter(calc => calc.calculatorType === 'code').length;
+    return calculatorRepository.findAll().filter(calc => calc.calculatorType === 'code').length;
   }
 
   getCategoryStats(): Record<string, number> {
     const stats: Record<string, number> = {};
-    Array.from(calculators.values()).forEach(calc => {
+    calculatorRepository.findAll().forEach(calc => {
       stats[calc.category] = (stats[calc.category] || 0) + 1;
     });
     return stats;

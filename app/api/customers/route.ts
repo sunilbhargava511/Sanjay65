@@ -1,26 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isValidEmail, normalizeEmail } from '@/lib/cookies';
-
-// In-memory storage for demo purposes
-// In production, this would be a proper database
-const customers: Map<string, Customer> = new Map();
-
-export interface Customer {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone?: string;
-  notes?: string;
-  marketingConsent: boolean;
-  smsConsent: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-function generateId(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
-}
+import { userRepository, Customer } from '@/lib/repositories/users';
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,52 +25,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const now = new Date().toISOString();
-
-    // Check if customer already exists
-    const existingCustomer = customers.get(normalizedEmail);
-    
-    if (existingCustomer) {
-      // Update existing customer
-      const updatedCustomer: Customer = {
-        ...existingCustomer,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        phone: phone?.trim() || existingCustomer.phone,
-        notes: notes?.trim() || existingCustomer.notes,
-        marketingConsent: marketingConsent ?? existingCustomer.marketingConsent,
-        smsConsent: smsConsent ?? existingCustomer.smsConsent,
-        updatedAt: now
-      };
-
-      customers.set(normalizedEmail, updatedCustomer);
-      
-      return NextResponse.json({
-        customer: updatedCustomer,
-        isNewCustomer: false
-      });
-    }
-
-    // Create new customer
-    const newCustomer: Customer = {
-      id: generateId(),
+    // Use upsertByEmail to create or update customer
+    const result = userRepository.upsertByEmail({
       email: normalizedEmail,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       phone: phone?.trim(),
       notes: notes?.trim(),
       marketingConsent: marketingConsent ?? false,
-      smsConsent: smsConsent ?? false,
-      createdAt: now,
-      updatedAt: now
-    };
-
-    customers.set(normalizedEmail, newCustomer);
+      smsConsent: smsConsent ?? false
+    });
 
     return NextResponse.json({
-      customer: newCustomer,
-      isNewCustomer: true
-    }, { status: 201 });
+      customer: result.customer,
+      isNewCustomer: result.isNewCustomer
+    }, { status: result.isNewCustomer ? 201 : 200 });
 
   } catch (error) {
     console.error('Error creating/updating customer:', error);
@@ -104,7 +53,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Get all customers (for admin use)
-    const customerArray = Array.from(customers.values());
+    const customerArray = userRepository.findAll();
     
     return NextResponse.json({
       customers: customerArray,

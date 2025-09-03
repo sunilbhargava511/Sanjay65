@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
-import { calculators, generateId } from '../data';
+import { calculatorRepository } from '@/lib/repositories/calculators';
 import { reactToHtmlConverter } from '@/lib/react-to-html-converter';
 
 export async function POST(request: NextRequest) {
@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const calculatorId = generateId();
     let calculatorUrl = '';
     let fileName = '';
     let standaloneUrl: string | null = null;
@@ -51,8 +50,8 @@ export async function POST(request: NextRequest) {
       const fileContent = await file.text();
       processedContent = fileContent;
 
-      // Check if we're in a production/serverless environment (like Vercel)
-      const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL;
+      // Check if we're in a production/serverless environment
+      const isProduction = process.env.NODE_ENV === 'production';
 
       if (fileExtension === '.tsx' || fileExtension === '.jsx' || fileExtension === '.ts' || fileExtension === '.js') {
         // Use the advanced React-to-HTML converter
@@ -69,12 +68,13 @@ export async function POST(request: NextRequest) {
           // Only save standalone files in development/local
           if (!isProduction) {
             console.log(`💾 Saving standalone file for ${file.name}...`);
+            // We'll get the actual ID after creating the calculator
             standaloneUrl = await reactToHtmlConverter.processAndSaveCalculator(
               fileContent,
               file.name,
               name,
               description,
-              calculatorId.toString()
+              'temp' // Temporary ID, will be replaced
             );
             console.log(`✅ Standalone calculator saved: ${standaloneUrl}`);
           } else {
@@ -90,13 +90,11 @@ export async function POST(request: NextRequest) {
       }
       // For .html/.htm files, use as-is
 
-      fileName = `calculator-${calculatorId}.html`;
-
       // In production, we can't write files to the filesystem
       // So we'll store the processed content in the calculator object instead
       if (isProduction) {
-        // Store processed HTML content directly in calculator data
-        calculatorUrl = `/api/calculators/${calculatorId}/view`;
+        // Store processed HTML content directly in calculator data - URL will be set after creation
+        calculatorUrl = ''; // Will be set after we create the calculator and get its ID
       } else {
         // Local development: write files as before
         const calculatorsDir = path.join(process.cwd(), 'public', 'calculators');
@@ -104,14 +102,16 @@ export async function POST(request: NextRequest) {
           await mkdir(calculatorsDir, { recursive: true });
         }
 
-        const calculatorDir = path.join(calculatorsDir, calculatorId.toString());
-        if (!existsSync(calculatorDir)) {
-          await mkdir(calculatorDir, { recursive: true });
+        // Create a temporary directory name - will be updated after getting real ID
+        const tempDir = path.join(calculatorsDir, 'temp');
+        if (!existsSync(tempDir)) {
+          await mkdir(tempDir, { recursive: true });
         }
 
-        const filePath = path.join(calculatorDir, fileName);
+        fileName = `calculator-temp.html`;
+        const filePath = path.join(tempDir, fileName);
         await writeFile(filePath, processedContent);
-        calculatorUrl = `/calculators/${calculatorId}/${fileName}`;
+        calculatorUrl = ''; // Will be set after creation
       }
 
     } else if (calculatorType === 'url') {
@@ -135,16 +135,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the highest order index
-    const existingCalculators = Array.from(calculators.values());
+    const existingCalculators = calculatorRepository.findAll();
     const orderIndex = existingCalculators.length;
 
-    // Create calculator object
-    const newCalculator = {
-      id: calculatorId,
+    // Create calculator object first to get the ID
+    const newCalculator = calculatorRepository.create({
       name: name.trim(),
       category: 'financial', // Default category
       description: description.trim(),
-      url: calculatorUrl,
+      url: calculatorUrl || '/temp', // Temporary URL, will be updated
       icon: 'Calculator',
       color: 'bg-blue-500',
       isActive: true,
@@ -154,16 +153,69 @@ export async function POST(request: NextRequest) {
       isPublished: true,
       fields: [],
       // Store processed content for production environments
-      ...(calculatorType === 'file' && processedContent ? { content: processedContent } : {})
-    };
+      content: calculatorType === 'file' && processedContent ? processedContent : undefined
+    });
 
-    // Save to data store
-    calculators.set(calculatorId, newCalculator);
+    // Now fix the URLs and file paths with the real ID
+    if (calculatorType === 'file') {
+      const isProduction = process.env.NODE_ENV === 'production';
+      
+      if (isProduction) {
+        // Update the URL to point to the view endpoint
+        calculatorUrl = `/api/calculators/${newCalculator.id}/view`;
+        calculatorRepository.update(newCalculator.id, { url: calculatorUrl });
+      } else {
+        // Move the file from temp location to the proper location with real ID
+        const calculatorsDir = path.join(process.cwd(), 'public', 'calculators');
+        const realDir = path.join(calculatorsDir, newCalculator.id.toString());
+        const tempDir = path.join(calculatorsDir, 'temp');
+        
+        if (!existsSync(realDir)) {
+          await mkdir(realDir, { recursive: true });
+        }
+        
+        const realFileName = `calculator-${newCalculator.id}.html`;
+        const realFilePath = path.join(realDir, realFileName);
+        const tempFilePath = path.join(tempDir, 'calculator-temp.html');
+        
+        // Copy file from temp to real location
+        if (existsSync(tempFilePath)) {
+          await writeFile(realFilePath, processedContent);
+          // Clean up temp file
+          try {
+            const fs = require('fs');
+            fs.unlinkSync(tempFilePath);
+          } catch (e) {
+            // Ignore cleanup errors
+          }
+        }
+        
+        calculatorUrl = `/calculators/${newCalculator.id}/${realFileName}`;
+        calculatorRepository.update(newCalculator.id, { 
+          url: calculatorUrl,
+          fileName: realFileName 
+        });
+        
+        // Update standalone URL with real ID if it was created
+        if (standaloneUrl) {
+          standaloneUrl = await reactToHtmlConverter.processAndSaveCalculator(
+            fileContent,
+            file.name,
+            name,
+            description,
+            newCalculator.id.toString()
+          );
+        }
+      }
+    }
 
+    // Get the final calculator state after updates
+    const finalCalculator = calculatorRepository.findById(newCalculator.id) || newCalculator;
+    
     return NextResponse.json({
       success: true,
       calculator: {
-        ...newCalculator,
+        ...finalCalculator,
         standaloneUrl
       },
       message: 'Calculator uploaded successfully',
@@ -255,7 +307,7 @@ function wrapReactComponentInHTML(reactCode: string, fileName: string, name: str
 
 export async function GET() {
   // Return list of uploaded calculators
-  const uploadedCalculators = Array.from(calculators.values());
+  const uploadedCalculators = calculatorRepository.findAll();
   return NextResponse.json({
     success: true,
     calculators: uploadedCalculators

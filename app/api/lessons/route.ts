@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { lessons, Lesson, generateId } from './data';
+import { lessonRepository } from '@/lib/repositories/lessons';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     
-    let lessonList = Array.from(lessons.values());
-    
-    if (category && category !== 'all') {
-      lessonList = lessonList.filter(lesson => lesson.category === category);
-    }
-    
-    // Sort by id for consistent ordering
-    lessonList.sort((a, b) => a.id - b.id);
+    let lessonList = category && category !== 'all' 
+      ? lessonRepository.findByCategory(category)
+      : lessonRepository.findActive();
 
     return NextResponse.json(lessonList);
 
@@ -52,18 +47,15 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const lessonId = generateId();
     
     // Get the highest order index if not provided
     let finalOrderIndex = orderIndex;
     if (finalOrderIndex === undefined) {
-      const existingLessons = Array.from(lessons.values());
+      const existingLessons = lessonRepository.findAll();
       finalOrderIndex = existingLessons.length;
     }
     
-    const newLesson: Lesson = {
-      id: lessonId,
+    const newLesson = lessonRepository.create({
       title: title.trim(),
       category,
       duration: duration?.trim() || '5 min read',
@@ -78,9 +70,7 @@ export async function POST(request: NextRequest) {
       color,
       active,
       completed: false
-    };
-
-    lessons.set(lessonId, newLesson);
+    });
 
     return NextResponse.json(newLesson, { status: 201 });
 
