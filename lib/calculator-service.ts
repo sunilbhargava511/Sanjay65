@@ -177,6 +177,33 @@ export class CalculatorService {
     });
     return stats;
   }
+
+  // Check if a calculator can be opened (has valid URL or content)
+  canOpenCalculator(calculator: CalculatorTool): boolean {
+    if (!calculator.isActive || !calculator.isPublished) {
+      return false;
+    }
+    
+    if (calculator.calculatorType === 'url') {
+      return !!calculator.url && this.validateUrl(calculator.url);
+    }
+    
+    if (calculator.calculatorType === 'code') {
+      return !!calculator.url || !!calculator.content;
+    }
+    
+    return false;
+  }
+
+  // Get the URL for opening a calculator
+  getCalculatorUrl(calculator: CalculatorTool): string {
+    if (calculator.calculatorType === 'url') {
+      return calculator.url;
+    }
+    
+    // For code-based calculators, return the URL or fallback to view endpoint
+    return calculator.url || `/api/calculators/${calculator.id}/view`;
+  }
 }
 
 // Export singleton instance
