@@ -1,5 +1,7 @@
 import { CalculatorTool, calculators, generateId } from '@/app/api/calculators/data';
 
+export type Calculator = CalculatorTool;
+
 export class CalculatorService {
   
   // Calculator Management
@@ -69,15 +71,35 @@ export class CalculatorService {
   }
 
   async getAllCalculators(activeOnly: boolean = false): Promise<CalculatorTool[]> {
-    const allCalculators = Array.from(calculators.values());
-    
-    if (activeOnly) {
-      return allCalculators
-        .filter(calc => calc.isActive && calc.isPublished)
-        .sort((a, b) => a.orderIndex - b.orderIndex);
+    try {
+      // Fetch from API instead of using local data
+      const response = await fetch('/api/calculators');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch calculators: ${response.statusText}`);
+      }
+      
+      const allCalculators: CalculatorTool[] = await response.json();
+      
+      if (activeOnly) {
+        return allCalculators
+          .filter(calc => calc.isActive && calc.isPublished)
+          .sort((a, b) => a.orderIndex - b.orderIndex);
+      }
+      
+      return allCalculators.sort((a, b) => a.orderIndex - b.orderIndex);
+    } catch (error) {
+      console.error('Error fetching calculators from API:', error);
+      // Fallback to local data if API fails
+      const allCalculators = Array.from(calculators.values());
+      
+      if (activeOnly) {
+        return allCalculators
+          .filter(calc => calc.isActive && calc.isPublished)
+          .sort((a, b) => a.orderIndex - b.orderIndex);
+      }
+      
+      return allCalculators.sort((a, b) => a.orderIndex - b.orderIndex);
     }
-    
-    return allCalculators.sort((a, b) => a.orderIndex - b.orderIndex);
   }
 
   async updateCalculator(calculatorId: number, updates: Partial<CalculatorTool>): Promise<void> {
