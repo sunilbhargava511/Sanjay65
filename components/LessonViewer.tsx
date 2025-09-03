@@ -20,6 +20,11 @@ export default function LessonViewer({ lessonId, onClose, onBack }: LessonViewer
     loadLesson();
   }, [lessonId]);
 
+  const convertLinksToClickable = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">$1</a>');
+  };
+
   const loadLesson = async () => {
     try {
       setLoading(true);
@@ -189,9 +194,10 @@ export default function LessonViewer({ lessonId, onClose, onBack }: LessonViewer
             <div className="p-4 sm:p-6 bg-gray-50 border-b border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">About this Video</h3>
               <div className="prose prose-sm sm:prose-base max-w-none">
-                <p className="text-gray-700 leading-relaxed">
-                  {lesson.videoSummary}
-                </p>
+                <p 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: convertLinksToClickable(lesson.videoSummary) }}
+                />
               </div>
             </div>
           )}

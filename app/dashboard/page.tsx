@@ -129,67 +129,7 @@ export default function Dashboard() {
           </button>
         </section>
 
-        {/* Getting Started Guide */}
-        <section className="mt-16 mx-auto max-w-4xl">
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8">
-            <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold text-amber-900">Your Financial Journey</h3>
-              <p className="text-sm text-amber-800 mt-1">Follow this simple path to Zero Financial Anxiety</p>
-            </div>
-            
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="flex items-center gap-4 rounded-xl bg-white/50 p-4">
-                <div className="rounded-full bg-blue-100 p-2 flex-shrink-0">
-                  <Calculator className="h-5 w-5 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-amber-900">Step 1: Calculate Your Numbers</p>
-                  <p className="text-xs text-amber-800">Use the Save/Spend Calculator to understand your financial foundation</p>
-                </div>
-                <button
-                  onClick={() => router.push('/calculators')}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-700 flex-shrink-0"
-                >
-                  Start →
-                </button>
-              </div>
-              
-              <div className="flex items-center gap-4 rounded-xl bg-white/50 p-4">
-                <div className="rounded-full bg-purple-100 p-2 flex-shrink-0">
-                  <BookOpen className="h-5 w-5 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-amber-900">Step 2: Learn the Fundamentals</p>
-                  <p className="text-xs text-amber-800">Master key concepts with our bite-sized educational lessons</p>
-                </div>
-                <button
-                  onClick={() => router.push('/learn')}
-                  className="text-xs font-medium text-purple-600 hover:text-purple-700 flex-shrink-0"
-                >
-                  Learn →
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Quick Links */}
-        <section className="mt-12 flex flex-wrap gap-3 justify-center">
-          <button
-            onClick={() => router.push('/user-guide')}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-          >
-            <FileText className="h-4 w-4" />
-            User Guide
-          </button>
-          <button
-            onClick={() => router.push('/settings')}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </button>
-        </section>
       </main>
 
       {/* Footer */}

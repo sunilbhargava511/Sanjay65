@@ -31,16 +31,10 @@ export default function LessonsManagement() {
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [formData, setFormData] = useState({
     title: '',
-    category: 'basics',
-    duration: '',
-    difficulty: 'Beginner',
     description: '',
-    content: '',
     videoUrl: '',
     videoSummary: '',
     startMessage: '',
-    icon: 'PiggyBank',
-    color: 'bg-green-500',
     active: true
   });
 
@@ -127,16 +121,10 @@ export default function LessonsManagement() {
     setEditingLesson(lesson);
     setFormData({
       title: lesson.title,
-      category: lesson.category,
-      duration: lesson.duration,
-      difficulty: lesson.difficulty,
       description: lesson.description,
-      content: lesson.content,
       videoUrl: lesson.videoUrl || '',
       videoSummary: lesson.videoSummary || '',
       startMessage: lesson.startMessage || '',
-      icon: lesson.icon,
-      color: lesson.color,
       active: lesson.active
     });
     setShowAddModal(true);
@@ -147,16 +135,10 @@ export default function LessonsManagement() {
     setEditingLesson(null);
     setFormData({
       title: '',
-      category: 'basics',
-      duration: '',
-      difficulty: 'Beginner',
       description: '',
-      content: '',
       videoUrl: '',
       videoSummary: '',
       startMessage: '',
-      icon: 'PiggyBank',
-      color: 'bg-green-500',
       active: true
     });
   };
@@ -223,10 +205,8 @@ export default function LessonsManagement() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 truncate">{lesson.title}</h3>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
-                      <span>{lesson.duration}</span>
-                      <span>{lesson.difficulty}</span>
-                      <span className="capitalize">{lesson.category}</span>
+                    <div className="text-xs text-gray-500 mt-1">
+                      <span>Educational Content</span>
                     </div>
                   </div>
                 </div>
@@ -296,73 +276,6 @@ export default function LessonsManagement() {
                   />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Category
-                    </label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                    >
-                      <option value="basics">Basics</option>
-                      <option value="savings">Savings</option>
-                      <option value="debt">Debt Management</option>
-                      <option value="investing">Investing</option>
-                      <option value="planning">Financial Planning</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Difficulty
-                    </label>
-                    <select
-                      value={formData.difficulty}
-                      onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                    >
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Duration
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                      placeholder="e.g., 5 min read"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Color Theme
-                    </label>
-                    <select
-                      value={formData.color}
-                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                    >
-                      <option value="bg-green-500">Green</option>
-                      <option value="bg-blue-500">Blue</option>
-                      <option value="bg-purple-500">Purple</option>
-                      <option value="bg-orange-500">Orange</option>
-                      <option value="bg-red-500">Red</option>
-                      <option value="bg-indigo-500">Indigo</option>
-                    </select>
-                  </div>
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -416,18 +329,6 @@ export default function LessonsManagement() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Content (Markdown supported)
-                  </label>
-                  <textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={10}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-mono text-sm"
-                    required
-                  />
-                </div>
 
                 <div className="flex items-center gap-2">
                   <input

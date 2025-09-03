@@ -26,7 +26,6 @@ interface Lesson {
 function EducationalContentInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,16 +72,6 @@ function EducationalContentInner() {
     return iconMap[iconName as keyof typeof iconMap] || Book;
   };
 
-  const categories = [
-    { id: 'all', name: 'All Lessons', count: lessons.length },
-    { id: 'basics', name: 'Basics', count: lessons.filter(l => l.category === 'basics').length },
-    { id: 'savings', name: 'Savings', count: lessons.filter(l => l.category === 'savings').length },
-    { id: 'debt', name: 'Debt Management', count: lessons.filter(l => l.category === 'debt').length },
-  ];
-
-  const filteredLessons = selectedCategory === 'all' 
-    ? lessons 
-    : lessons.filter(lesson => lesson.category === selectedCategory);
 
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
 
@@ -139,26 +128,10 @@ function EducationalContentInner() {
           </p>
         </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap gap-2 justify-center mb-8">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
-                selectedCategory === category.id
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {category.name} ({category.count})
-            </button>
-          ))}
-        </div>
 
         {/* Lessons Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredLessons.map((lesson) => {
+          {lessons.map((lesson) => {
             const Icon = getIconComponent(lesson.icon);
             return (
               <div
@@ -172,12 +145,8 @@ function EducationalContentInner() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 truncate">{lesson.title}</h3>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {lesson.duration}
-                      </span>
-                      <span>{lesson.difficulty}</span>
+                    <div className="text-xs text-gray-500 mt-1">
+                      <span>Educational Content</span>
                     </div>
                   </div>
                 </div>
@@ -200,16 +169,6 @@ function EducationalContentInner() {
           })}
         </div>
 
-        {/* Progress Summary */}
-        <div className="mt-12 bg-purple-50 border border-purple-200 rounded-xl p-6 text-center">
-          <h2 className="text-xl font-semibold text-purple-900 mb-2">Your Progress</h2>
-          <p className="text-purple-800 mb-4">
-            Complete these foundational lessons to build your financial knowledge step by step.
-          </p>
-          <div className="text-sm text-purple-700">
-            {lessons.filter(l => l.completed).length} of {lessons.length} lessons completed
-          </div>
-        </div>
       </main>
     </div>
   );

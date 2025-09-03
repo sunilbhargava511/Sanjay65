@@ -133,18 +133,6 @@ export default function CalculatorsList({
         </div>
       )}
 
-      {/* Info Footer - Mobile Optimized */}
-      {calculators.length > 0 && (
-        <div className="mt-6 sm:mt-8 bg-gray-50 rounded-lg p-3 sm:p-4">
-          <div className="text-center">
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2">🔗 Calculator Access</h3>
-            <p className="text-xs sm:text-sm text-gray-600">
-              These calculators are safe to use and designed for educational purposes. 
-              External tools open in new windows and don&apos;t require personal information from your account.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
