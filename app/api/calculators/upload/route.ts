@@ -46,21 +46,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Create calculators directory if it doesn't exist
-      const calculatorsDir = path.join(process.cwd(), 'public', 'calculators');
-      if (!existsSync(calculatorsDir)) {
-        await mkdir(calculatorsDir, { recursive: true });
-      }
-
-      // Create calculator-specific directory
-      const calculatorDir = path.join(calculatorsDir, calculatorId.toString());
-      if (!existsSync(calculatorDir)) {
-        await mkdir(calculatorDir, { recursive: true });
-      }
-
       // Handle different file types with sophisticated processing
       const fileContent = await file.text();
       let processedContent = fileContent;
+
+      // Check if we're in a production/serverless environment (like Vercel)
+      const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL;
 
       if (fileExtension === '.tsx' || fileExtension === '.jsx' || fileExtension === '.ts' || fileExtension === '.js') {
         // Use the advanced React-to-HTML converter
@@ -72,16 +63,17 @@ export async function POST(request: NextRequest) {
             description
           );
           
-          // Also create standalone URL
-          standaloneUrl = await reactToHtmlConverter.processAndSaveCalculator(
-            fileContent,
-            file.name,
-            name,
-            description,
-            calculatorId.toString()
-          );
-          
-          console.log(`✅ Standalone calculator saved: ${standaloneUrl}`);
+          // Only save standalone files in development/local
+          if (!isProduction) {
+            standaloneUrl = await reactToHtmlConverter.processAndSaveCalculator(
+              fileContent,
+              file.name,
+              name,
+              description,
+              calculatorId.toString()
+            );
+            console.log(`✅ Standalone calculator saved: ${standaloneUrl}`);
+          }
         } catch (error) {
           console.error('Advanced processing failed, falling back to basic wrapper:', error);
           // Fallback to basic processing
@@ -91,13 +83,28 @@ export async function POST(request: NextRequest) {
       // For .html/.htm files, use as-is
 
       fileName = `calculator-${calculatorId}.html`;
-      const filePath = path.join(calculatorDir, fileName);
 
-      // Write file to disk
-      await writeFile(filePath, processedContent);
+      // In production, we can't write files to the filesystem
+      // So we'll store the processed content in the calculator object instead
+      if (isProduction) {
+        // Store processed HTML content directly in calculator data
+        calculatorUrl = `/api/calculators/${calculatorId}/view`;
+      } else {
+        // Local development: write files as before
+        const calculatorsDir = path.join(process.cwd(), 'public', 'calculators');
+        if (!existsSync(calculatorsDir)) {
+          await mkdir(calculatorsDir, { recursive: true });
+        }
 
-      // Set URL for local hosting
-      calculatorUrl = `/calculators/${calculatorId}/${fileName}`;
+        const calculatorDir = path.join(calculatorsDir, calculatorId.toString());
+        if (!existsSync(calculatorDir)) {
+          await mkdir(calculatorDir, { recursive: true });
+        }
+
+        const filePath = path.join(calculatorDir, fileName);
+        await writeFile(filePath, processedContent);
+        calculatorUrl = `/calculators/${calculatorId}/${fileName}`;
+      }
 
     } else if (calculatorType === 'url') {
       if (!url) {
@@ -137,7 +144,9 @@ export async function POST(request: NextRequest) {
       fileName: fileName || undefined,
       orderIndex,
       isPublished: true,
-      fields: []
+      fields: [],
+      // Store processed content for production environments
+      ...(calculatorType === 'file' && processedContent ? { content: processedContent } : {})
     };
 
     // Save to data store

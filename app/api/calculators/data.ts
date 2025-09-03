@@ -16,6 +16,7 @@ export interface CalculatorTool {
   artifactUrl?: string; // For Claude artifact URLs
   orderIndex: number; // For ordering calculators
   isPublished: boolean; // Draft/published state
+  content?: string; // Processed HTML content for production file uploads
   fields: Array<{
     name: string;
     label: string;
