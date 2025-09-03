@@ -134,7 +134,7 @@ export default function Dashboard() {
 
           {/* Start Calculating */}
           <button
-            onClick={() => router.push('/calculator/save-spend')}
+            onClick={() => router.push('/calculators')}
             className="group relative rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition hover:shadow-lg active:scale-[0.98]"
           >
             <div className="flex items-center gap-4 mb-6">
@@ -195,7 +195,7 @@ export default function Dashboard() {
                   <p className="text-xs text-amber-800">Use the Save/Spend Calculator to understand your financial foundation</p>
                 </div>
                 <button
-                  onClick={() => router.push('/calculator/save-spend')}
+                  onClick={() => router.push('/calculators')}
                   className="text-xs font-medium text-blue-600 hover:text-blue-700 flex-shrink-0"
                 >
                   Start →
