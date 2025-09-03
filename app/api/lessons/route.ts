@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!title || !description || !content) {
+    if (!title || !description) {
       return NextResponse.json(
-        { error: 'Title, description, and content are required' },
+        { error: 'Title and description are required' },
         { status: 400 }
       );
     }
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       duration: duration?.trim() || '5 min read',
       difficulty,
       description: description.trim(),
-      content: content.trim(),
+      content: content?.trim() || '',
       videoUrl: videoUrl?.trim(),
       videoSummary: videoSummary?.trim(),
       startMessage: startMessage?.trim(),

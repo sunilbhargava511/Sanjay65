@@ -202,15 +202,6 @@ export default function LessonViewer({ lessonId, onClose, onBack }: LessonViewer
             </div>
           )}
 
-          {/* Lesson Content */}
-          <div className="p-4 sm:p-6">
-            <div className="prose prose-sm sm:prose-base max-w-none">
-              <div 
-                className="text-gray-800 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: lesson.content.replace(/\n/g, '<br>') }}
-              />
-            </div>
-          </div>
 
           {/* Educational Disclaimer - Mobile Optimized */}
           <div className="p-4 sm:p-6 bg-amber-50 border-t border-amber-200">
