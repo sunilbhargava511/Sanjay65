@@ -213,6 +213,31 @@ export class LessonService {
     };
     return categoryMap[category] || category.charAt(0).toUpperCase() + category.slice(1);
   }
+
+  // Duration formatter helper
+  formatDuration(duration: string): string {
+    // If duration is already formatted (e.g., "5 min read"), return as-is
+    if (duration.includes('min') || duration.includes('hour') || duration.includes('sec')) {
+      return duration;
+    }
+    
+    // Try to parse as number (minutes)
+    const minutes = parseInt(duration);
+    if (!isNaN(minutes)) {
+      if (minutes < 60) {
+        return `${minutes} min read`;
+      } else {
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        return remainingMinutes > 0 
+          ? `${hours}h ${remainingMinutes}m read`
+          : `${hours}h read`;
+      }
+    }
+    
+    // Return original string if can't parse
+    return duration;
+  }
 }
 
 // Export singleton instance
