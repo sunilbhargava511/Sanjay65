@@ -330,6 +330,16 @@ export class ReactToHtmlConverter {
     htmlContent: string, 
     calculatorId: string
   ): Promise<string> {
+    // Check if we're in production/serverless environment
+    const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL;
+    
+    if (isProduction) {
+      // In production, we can't write files, so return API endpoint URL
+      console.log(`🚀 Production mode: Content will be served via API endpoint`);
+      return `/api/calculators/${calculatorId}/view`;
+    }
+    
+    // Development mode: write files as before
     const publicDir = path.join(process.cwd(), 'public', 'calculators');
     
     // Ensure directory exists
@@ -341,6 +351,7 @@ export class ReactToHtmlConverter {
     const filePath = path.join(publicDir, fileName);
     
     fs.writeFileSync(filePath, htmlContent, 'utf8');
+    console.log(`📁 Saved calculator to: ${filePath}`);
     
     return `/calculators/${fileName}`;
   }
