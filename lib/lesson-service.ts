@@ -198,6 +198,21 @@ export class LessonService {
   getYouTubeThumbnail(videoId: string): string {
     return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
   }
+
+  // Category display name helper
+  getCategoryDisplayName(category: string): string {
+    const categoryMap: Record<string, string> = {
+      'basics': 'Basics',
+      'savings': 'Savings',
+      'debt': 'Debt Management',
+      'investing': 'Investing',
+      'planning': 'Financial Planning',
+      'general': 'General',
+      'young-adult': 'Young Adult',
+      'older-adult': 'Older Adult'
+    };
+    return categoryMap[category] || category.charAt(0).toUpperCase() + category.slice(1);
+  }
 }
 
 // Export singleton instance
