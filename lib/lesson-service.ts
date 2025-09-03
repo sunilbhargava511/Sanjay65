@@ -54,15 +54,35 @@ export class LessonService {
   }
 
   async getAllLessons(activeOnly: boolean = false): Promise<Lesson[]> {
-    const allLessons = Array.from(lessons.values());
-    
-    if (activeOnly) {
-      return allLessons
-        .filter(lesson => lesson.active)
-        .sort((a, b) => a.orderIndex - b.orderIndex);
+    try {
+      // Fetch from API instead of using local data
+      const response = await fetch('/api/lessons');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch lessons: ${response.statusText}`);
+      }
+      
+      const allLessons: Lesson[] = await response.json();
+      
+      if (activeOnly) {
+        return allLessons
+          .filter(lesson => lesson.active)
+          .sort((a, b) => a.orderIndex - b.orderIndex);
+      }
+      
+      return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
+    } catch (error) {
+      console.error('Error fetching lessons from API:', error);
+      // Fallback to local data if API fails
+      const allLessons = Array.from(lessons.values());
+      
+      if (activeOnly) {
+        return allLessons
+          .filter(lesson => lesson.active)
+          .sort((a, b) => a.orderIndex - b.orderIndex);
+      }
+      
+      return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
     }
-    
-    return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
   }
 
   // Alias method for backward compatibility
