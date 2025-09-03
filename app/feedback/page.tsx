@@ -161,7 +161,7 @@ export default function FeedbackPage() {
                 <div className="text-sm text-purple-700">We'll consider adding this topic to our educational content.</div>
               </div>
             ) : (
-              <form onSubmit={handleTopicSubmit} className="space-y-6">
+              <div className="space-y-6">
                 <div>
                   <textarea
                     value={topicSuggestion}
@@ -178,14 +178,13 @@ export default function FeedbackPage() {
                     required
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="w-full flex items-center justify-center gap-2 bg-purple-600 text-white rounded-xl px-6 py-3 font-semibold hover:bg-purple-700 transition active:scale-[0.98]"
-                >
-                  <Send className="h-4 w-4" />
-                  Suggest Topic
-                </button>
-              </form>
+                <div className="w-full bg-purple-50 border border-purple-200 rounded-xl px-6 py-4 text-center">
+                  <p className="text-purple-800 font-semibold mb-2">📧 Send your topic suggestion via email:</p>
+                  <a href="mailto:sanjay@tiseed.com" className="text-purple-600 font-medium underline hover:text-purple-700">
+                    sanjay@tiseed.com
+                  </a>
+                </div>
+              </div>
             )}
             
             <div className="mt-6 p-4 bg-gray-50 rounded-xl">
@@ -214,7 +213,7 @@ export default function FeedbackPage() {
                 <div className="text-sm text-blue-700">Your feedback has been submitted. We'll get back to you soon.</div>
               </div>
             ) : (
-              <form onSubmit={handleFeedbackSubmit} className="space-y-6">
+              <div className="space-y-6">
                 <div>
                   <textarea
                     value={feedbackText}
@@ -231,14 +230,13 @@ export default function FeedbackPage() {
                     required
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white rounded-xl px-6 py-3 font-semibold hover:bg-blue-700 transition active:scale-[0.98]"
-                >
-                  <Send className="h-4 w-4" />
-                  Send Feedback
-                </button>
-              </form>
+                <div className="w-full bg-blue-50 border border-blue-200 rounded-xl px-6 py-4 text-center">
+                  <p className="text-blue-800 font-semibold mb-2">📧 Send your feedback via email:</p>
+                  <a href="mailto:sanjay@tiseed.com" className="text-blue-600 font-medium underline hover:text-blue-700">
+                    sanjay@tiseed.com
+                  </a>
+                </div>
+              </div>
             )}
           </div>
         </div>

@@ -148,9 +148,6 @@ export default function ZeroFinanxPricingPage() {
           <p className="leading-relaxed">
             zerofinanx provides educational content and tools. It is <span className="font-semibold">not</span> investment, legal, tax, or accounting advice. Consult a qualified professional before acting.
           </p>
-          <div className="mt-4">
-            <a href="/admin/login" className="underline underline-offset-2 hover:no-underline font-medium">Admin Login</a>
-          </div>
         </section>
       </main>
 
