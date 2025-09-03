@@ -65,6 +65,11 @@ export class LessonService {
     return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
   }
 
+  // Alias method for backward compatibility
+  async getLessons(options: { activeOnly?: boolean } = {}): Promise<Lesson[]> {
+    return this.getAllLessons(options.activeOnly || false);
+  }
+
   async updateLesson(lessonId: number, updates: Partial<Lesson>): Promise<void> {
     const lesson = lessons.get(lessonId);
     if (!lesson) {
