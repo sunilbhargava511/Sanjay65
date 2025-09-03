@@ -24,8 +24,8 @@ export default function LessonViewer({ lessonId, onClose, onBack }: LessonViewer
     try {
       setLoading(true);
       setError(null);
-      const data = await lessonService.getLessons({});
-      const foundLesson = data.lessons.find(l => l.id === lessonId);
+      const allLessons = await lessonService.getLessons({});
+      const foundLesson = allLessons.find(l => l.id.toString() === lessonId);
       if (foundLesson) {
         setLesson(foundLesson);
       } else {

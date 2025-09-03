@@ -36,17 +36,29 @@ export default function LessonsList({
       setLoading(true);
       setError(null);
       
-      const filters = {
-        activeOnly: true,
-        ...(category && { category })
-      };
+      console.log('🔄 Loading lessons for category:', category);
       
-      const data = await lessonService.getLessons(filters);
-      setLessons(data.lessons);
-      setCategoryCounts(data.categories);
+      // Get all active lessons
+      const allLessons = await lessonService.getLessons({ activeOnly: true });
+      console.log('✅ Loaded lessons:', allLessons.length);
+      
+      // Filter by category if specified
+      const filteredLessons = category 
+        ? allLessons.filter(lesson => lesson.category === category)
+        : allLessons;
+      
+      setLessons(filteredLessons);
+      
+      // Calculate category counts
+      const counts: Record<string, number> = {};
+      allLessons.forEach(lesson => {
+        counts[lesson.category] = (counts[lesson.category] || 0) + 1;
+      });
+      setCategoryCounts(counts);
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load lessons');
-      console.error('Error loading lessons:', err);
+      console.error('❌ Error loading lessons:', err);
     } finally {
       setLoading(false);
     }

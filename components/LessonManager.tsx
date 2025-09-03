@@ -21,8 +21,8 @@ export default function LessonManager() {
     try {
       setLoading(true);
       setError(null);
-      const data = await lessonService.getLessons({});
-      setLessons(data.lessons);
+      const allLessons = await lessonService.getLessons({});
+      setLessons(allLessons);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load lessons');
       console.error('Error loading lessons:', err);

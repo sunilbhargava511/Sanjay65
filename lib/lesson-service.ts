@@ -55,23 +55,46 @@ export class LessonService {
 
   async getAllLessons(activeOnly: boolean = false): Promise<Lesson[]> {
     try {
-      // Fetch from API instead of using local data
-      const response = await fetch('/api/lessons');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch lessons: ${response.statusText}`);
+      // Check if we're in browser environment
+      if (typeof window !== 'undefined') {
+        console.log('🔄 Fetching lessons from API...');
+        const response = await fetch('/api/lessons', {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch lessons: ${response.status} ${response.statusText}`);
+        }
+        
+        const allLessons: Lesson[] = await response.json();
+        console.log('✅ Fetched lessons from API:', allLessons.length, 'lessons');
+        
+        if (activeOnly) {
+          return allLessons
+            .filter(lesson => lesson.active)
+            .sort((a, b) => a.orderIndex - b.orderIndex);
+        }
+        
+        return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
+      } else {
+        console.log('🔧 Server-side: using local data');
+        // Server-side: use local data
+        const allLessons = Array.from(lessons.values());
+        
+        if (activeOnly) {
+          return allLessons
+            .filter(lesson => lesson.active)
+            .sort((a, b) => a.orderIndex - b.orderIndex);
+        }
+        
+        return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
       }
-      
-      const allLessons: Lesson[] = await response.json();
-      
-      if (activeOnly) {
-        return allLessons
-          .filter(lesson => lesson.active)
-          .sort((a, b) => a.orderIndex - b.orderIndex);
-      }
-      
-      return allLessons.sort((a, b) => a.orderIndex - b.orderIndex);
     } catch (error) {
-      console.error('Error fetching lessons from API:', error);
+      console.error('❌ Error fetching lessons from API:', error);
       // Fallback to local data if API fails
       const allLessons = Array.from(lessons.values());
       

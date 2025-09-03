@@ -21,8 +21,14 @@ export default function LessonCategoryView({ className = '' }: LessonCategoryVie
   const loadCategoryCounts = async () => {
     try {
       setLoading(true);
-      const data = await lessonService.getLessons({ activeOnly: true });
-      setCategoryCounts(data.categories);
+      const allLessons = await lessonService.getLessons({ activeOnly: true });
+      
+      // Calculate category counts
+      const counts: Record<string, number> = {};
+      allLessons.forEach(lesson => {
+        counts[lesson.category] = (counts[lesson.category] || 0) + 1;
+      });
+      setCategoryCounts(counts);
     } catch (error) {
       console.error('Error loading category counts:', error);
     } finally {
