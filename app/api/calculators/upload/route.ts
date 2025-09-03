@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
     let calculatorUrl = '';
     let fileName = '';
     let standaloneUrl: string | null = null;
+    let processedContent = ''; // Declare at function scope
 
     if (calculatorType === 'file') {
       if (!file) {
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 
       // Handle different file types with sophisticated processing
       const fileContent = await file.text();
-      let processedContent = fileContent;
+      processedContent = fileContent;
 
       // Check if we're in a production/serverless environment (like Vercel)
       const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL;
@@ -56,15 +57,18 @@ export async function POST(request: NextRequest) {
       if (fileExtension === '.tsx' || fileExtension === '.jsx' || fileExtension === '.ts' || fileExtension === '.js') {
         // Use the advanced React-to-HTML converter
         try {
+          console.log(`🔧 Processing ${file.name} with ReactToHtmlConverter...`);
           processedContent = await reactToHtmlConverter.convertToStandaloneHtml(
             fileContent,
             file.name,
             name,
             description
           );
+          console.log(`✅ React-to-HTML conversion successful for ${file.name}`);
           
           // Only save standalone files in development/local
           if (!isProduction) {
+            console.log(`💾 Saving standalone file for ${file.name}...`);
             standaloneUrl = await reactToHtmlConverter.processAndSaveCalculator(
               fileContent,
               file.name,
@@ -73,9 +77,13 @@ export async function POST(request: NextRequest) {
               calculatorId.toString()
             );
             console.log(`✅ Standalone calculator saved: ${standaloneUrl}`);
+          } else {
+            console.log(`🚀 Production mode: Standalone file will be served via API`);
           }
         } catch (error) {
-          console.error('Advanced processing failed, falling back to basic wrapper:', error);
+          console.error('❌ Advanced processing failed:', error);
+          console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
+          console.log('🔄 Falling back to basic wrapper...');
           // Fallback to basic processing
           processedContent = wrapReactComponentInHTML(fileContent, file.name, name);
         }

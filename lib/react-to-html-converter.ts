@@ -108,13 +108,24 @@ export class ReactToHtmlConverter {
     cleaned = cleaned.replace(/^[\s]*import\s+.*?from\s+['"][^'"]*['"];?\s*$/gm, '');
     cleaned = cleaned.replace(/^[\s]*import\s+['"][^'"]*['"];?\s*$/gm, '');
     
-    // Step 2: Remove ALL export statements completely
+    // Step 2: Handle export statements more carefully
+    // First preserve the component name from export default
+    const exportDefaultMatch = cleaned.match(/export\s+default\s+(\w+);?\s*$/m);
+    const componentName = exportDefaultMatch ? exportDefaultMatch[1] : null;
+    
+    // Remove export default but preserve component
+    cleaned = cleaned.replace(/^[\s]*export\s+default\s+(\w+);?\s*$/gm, '// Component: $1');
+    
+    // Remove other export statements
     cleaned = cleaned.replace(/^[\s]*export\s+.*$/gm, '');
     
     // Step 3: Remove any references to exports, module, require
     cleaned = cleaned.replace(/exports\./g, 'window.');
     cleaned = cleaned.replace(/module\.exports/g, 'window.Calculator');
     cleaned = cleaned.replace(/require\(/g, '// require(');
+    
+    // Step 4: Clean up any remaining blank lines
+    cleaned = cleaned.replace(/^\s*[\r\n]/gm, '');
     
     return cleaned;
   }
@@ -141,18 +152,24 @@ export class ReactToHtmlConverter {
    * Extract component name from React code
    */
   private extractComponentName(code: string): string | null {
-    // Try different patterns
+    // Try different patterns in order of preference
     const patterns = [
-      /const\s+(\w+)\s*=\s*\(\s*\)\s*=>/,  // const ComponentName = () =>
-      /function\s+(\w+)\s*\(/,              // function ComponentName(
-      /export\s+default\s+function\s+(\w+)/, // export default function ComponentName
-      /class\s+(\w+)\s+extends/             // class ComponentName extends
+      /const\s+(\w+)\s*=\s*\(\s*\)\s*=>/,         // const ComponentName = () =>
+      /function\s+(\w+)\s*\(/,                     // function ComponentName(
+      /export\s+default\s+function\s+(\w+)/,      // export default function ComponentName
+      /export\s+default\s+(\w+);?\s*$/m,          // export default ComponentName;
+      /class\s+(\w+)\s+extends/,                  // class ComponentName extends
+      /const\s+(\w+)\s*=\s*\([^)]*\)\s*=>/       // const ComponentName = (props) =>
     ];
 
     for (const pattern of patterns) {
       const match = code.match(pattern);
-      if (match) {
-        return match[1];
+      if (match && match[1]) {
+        // Make sure it's a valid component name (starts with capital)
+        const componentName = match[1];
+        if (componentName[0] === componentName[0].toUpperCase()) {
+          return componentName;
+        }
       }
     }
 
@@ -340,20 +357,26 @@ export class ReactToHtmlConverter {
     }
     
     // Development mode: write files as before
-    const publicDir = path.join(process.cwd(), 'public', 'calculators');
-    
-    // Ensure directory exists
-    if (!fs.existsSync(publicDir)) {
-      fs.mkdirSync(publicDir, { recursive: true });
+    try {
+      const publicDir = path.join(process.cwd(), 'public', 'calculators');
+      
+      // Ensure directory exists
+      if (!fs.existsSync(publicDir)) {
+        fs.mkdirSync(publicDir, { recursive: true });
+      }
+      
+      const fileName = `${calculatorId}.html`;
+      const filePath = path.join(publicDir, fileName);
+      
+      fs.writeFileSync(filePath, htmlContent, 'utf8');
+      console.log(`📁 Saved calculator to: ${filePath}`);
+      
+      return `/calculators/${fileName}`;
+    } catch (error) {
+      console.error('Error saving calculator file:', error);
+      // Fallback to API endpoint even in development if file write fails
+      return `/api/calculators/${calculatorId}/view`;
     }
-    
-    const fileName = `${calculatorId}.html`;
-    const filePath = path.join(publicDir, fileName);
-    
-    fs.writeFileSync(filePath, htmlContent, 'utf8');
-    console.log(`📁 Saved calculator to: ${filePath}`);
-    
-    return `/calculators/${fileName}`;
   }
 
   /**
