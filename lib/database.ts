@@ -8,6 +8,11 @@ let db: Database.Database | null = null;
 // Database file path
 const DB_PATH = path.join(process.cwd(), 'data', 'zerofinanx.db');
 
+// Export the database path for use in other modules
+export function getDatabasePath(): string {
+  return DB_PATH;
+}
+
 // Initialize database with schema
 export function initDatabase(): Database.Database {
   if (db) {

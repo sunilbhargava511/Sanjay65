@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { getDatabasePath } from '@/lib/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,8 +27,8 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
-    // Path to the database file
-    const dbPath = path.join(process.cwd(), 'data', 'zerofinanx.db');
+    // Path to the database file - use the same path as the main app
+    const dbPath = getDatabasePath();
     const backupPath = path.join(process.cwd(), 'data', `zerofinanx_backup_${Date.now()}.db`);
     
     // Create backup of existing database

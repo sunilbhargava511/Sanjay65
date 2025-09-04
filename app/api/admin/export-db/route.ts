@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
-import path from 'path';
+import { getDatabasePath } from '@/lib/database';
 
 export async function GET() {
   try {
-    // Path to the database file
-    const dbPath = path.join(process.cwd(), 'data', 'zerofinanx.db');
+    // Path to the database file - use the same path as the main app
+    const dbPath = getDatabasePath();
     
     // Check if database file exists
     if (!fs.existsSync(dbPath)) {
