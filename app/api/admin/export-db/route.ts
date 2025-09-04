@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
-import { getDatabasePath } from '@/lib/database';
+import { getDatabasePath, getDatabase } from '@/lib/database';
+import Database from 'better-sqlite3';
 
 export async function GET() {
   try {
@@ -15,7 +16,11 @@ export async function GET() {
       );
     }
     
-    // Read the database file
+    // Force WAL checkpoint to ensure all data is in the main file
+    const db = getDatabase();
+    db.pragma('wal_checkpoint(FULL)');
+    
+    // Read the database file after checkpoint
     const dbBuffer = fs.readFileSync(dbPath);
     
     // Create response with appropriate headers for file download
