@@ -229,6 +229,29 @@ export default function AdminDashboard() {
             </div>
           </Link>
 
+          {/* Database Management */}
+          <Link href="/admin/database" className="block">
+            <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Database</h2>
+                  <p className="text-sm text-gray-600">Export & Import</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500">
+                Export database backups and import existing data
+              </p>
+              <div className="mt-4 text-cyan-600 text-sm font-medium">
+                Manage Database →
+              </div>
+            </div>
+          </Link>
+
         </div>
 
         {/* Quick Actions */}
